@@ -1,26 +1,59 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <!-- 使用EL布局 -->
+  <UserHeader/>
+  <div class="container">
+    <div class="aside">
+      <UserBox/>
+      <NowRou/>
+    </div>
+    <div class="main">
+      <RouTable/>
+    </div>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import NowRou from './components/NowRou.vue'
+import UserBox from './components/UserBox.vue'
+import UserHeader from './components/UserHeader.vue'
+import RouTable from './components/RouTable.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    UserHeader,
+    RouTable,
+    UserBox,
+    NowRou
   }
 }
 </script>
 
-<style>
+<style> 
+/* 页面属性 */
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 }
+.container{
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.container .aside{
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #ccc;
+  width: 30%;
+}
+.container .main{
+  border: 1px solid #ccc;
+  width: 65%;
+}
+
 </style>
