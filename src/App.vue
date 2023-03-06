@@ -9,10 +9,13 @@
     <div class="main">
       <RouTable/>
     </div>
+    <!-- 可以后期做成消息箱子 -->
+    <TipsBox v-if="false"/>
   </div>
 </template>
 
 <script>
+import TipsBox from './components/TipsBox.vue'
 import NowRou from './components/NowRou.vue'
 import UserBox from './components/UserBox.vue'
 import UserHeader from './components/UserHeader.vue'
@@ -24,7 +27,8 @@ export default {
     UserHeader,
     RouTable,
     UserBox,
-    NowRou
+    NowRou,
+    TipsBox
   }
 }
 </script>
@@ -38,6 +42,7 @@ export default {
   text-align: center;
 }
 .container{
+  position: relative;
   margin-top: 10px;
   display: flex;
   flex-direction: row;
