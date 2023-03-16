@@ -88,30 +88,16 @@ const useLoginStore = defineStore('Login',{
     }
 })
 
-// const useTipsStore = defineStore('Tips',{
-//     state:()=>{
-//         reutrn {
-//             TipsShow:false,
-//             TipsTemp:true,
-//             TipsShowList:[],
-//             TipsTempList:[]
-//         }
-//     },
-//     actions:{
-//         // 给定提示词和事件id
-//         AddTips(tips,id){
-//             let item = {
-//                 tips,
-//                 id
-//             }
-//             TipsTempList.put(item);
-//             console.log(TipsTempList);
-//         }
-//     }
-// })
-
+const useTimeStore = defineStore('time',{
+    state:()=>{
+        return{
+            GlobalTime:Date,
+            Timespeed:1//正常速率
+        }
+    }
+})
 
 export{
     useLoginStore,
-    // useTipsStore
+    useTimeStore
 }

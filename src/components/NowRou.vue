@@ -1,4 +1,7 @@
 <template>
+    <div>
+        <slot/>
+    </div>
   {{name}}
 </template>
 

@@ -4,13 +4,16 @@
   <div class="container">
     <div class="aside">
       <UserBox/>
-      <NowRou/>
+      <NowRou>
+        <TimeShow/>
+      </NowRou>
     </div>
     <div class="main">
       <RouTable/>
     </div>
     <!-- 可以后期做成消息箱子 -->
     <TipsBox v-if="false"/>
+    <!-- 时间 -->
   </div>
 </template>
 
@@ -20,6 +23,7 @@ import NowRou from './components/NowRou.vue'
 import UserBox from './components/UserBox.vue'
 import UserHeader from './components/UserHeader.vue'
 import RouTable from './components/RouTable.vue'
+import TimeShow from './components/TimeShow.vue'
 
 export default {
   name: 'App',
@@ -28,7 +32,8 @@ export default {
     RouTable,
     UserBox,
     NowRou,
-    TipsBox
+    TipsBox,
+    TimeShow
   }
 }
 </script>
