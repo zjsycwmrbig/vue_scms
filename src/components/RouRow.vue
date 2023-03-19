@@ -2,12 +2,20 @@
     <div class="roucol">
         <div>星期六</div>
         <br/>
+        <transition-group 
+        appear    
+        name="item_animate"
+        enter-active-class="animate__animated animate__backInDown"
+        leave-active-class="animate__animated animate__backOutUp"
+    >
+        <!-- 这里的动画没效果 -->
         <div class="card" v-for="item in items" :key="item.id" :style="SetStyle(item)" @click="ShowClass(item.name)">{{ item.name }}</div>
+        </transition-group>
+        
     </div>
 </template>
 
 <script>
-    // import { useStore } from 'vuex'
     export default {
         name:"RouRow",
         // 一个是数据,一个是标号

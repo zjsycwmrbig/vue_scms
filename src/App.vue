@@ -4,9 +4,8 @@
   <div class="container">
     <div class="aside">
       <UserBox/>
-      <NowRou>
-        <TimeShow/>
-      </NowRou>
+      <TimeShow/>
+      <NowRou/>
     </div>
     <div class="main">
       <RouTable/>
@@ -14,17 +13,22 @@
     <!-- 可以后期做成消息箱子 -->
     <TipsBox v-if="false"/>
     <!-- 时间 -->
+    <MapPart v-show="mapstore.show"/>
   </div>
+  <HitoPart/> 
 </template>
 
 <script>
 import TipsBox from './components/TipsBox.vue'
+import HitoPart from './components/HitoPart.vue'
 import NowRou from './components/NowRou.vue'
 import UserBox from './components/UserBox.vue'
 import UserHeader from './components/UserHeader.vue'
 import RouTable from './components/RouTable.vue'
 import TimeShow from './components/TimeShow.vue'
+import MapPart from './components/MapPart.vue'
 
+import { useMapStore } from '@/store/pinia';
 export default {
   name: 'App',
   components: {
@@ -33,7 +37,15 @@ export default {
     UserBox,
     NowRou,
     TipsBox,
-    TimeShow
+    TimeShow,
+    MapPart,
+    HitoPart
+  },
+  setup(){
+    const mapstore = useMapStore();
+    return{
+      mapstore,
+    }
   }
 }
 </script>

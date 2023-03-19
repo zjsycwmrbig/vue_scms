@@ -1,7 +1,7 @@
 <template>
   <div class="routable">
     <!-- 传入数据 -->
-    <RouRow v-for="item in totalrous" :key="item.name" :items="item" :index="index"></RouRow>
+    <RouRow v-for=" (item,index) in totalrous" :key="index" :items="item" :index="index"></RouRow>    
   </div>
 </template>
 
@@ -18,7 +18,7 @@ import RouRow from "./RouRow.vue"
             var totalrous = new Array(7);
             var titles = ["健美[男]（男39健美）","计算机组成原理","形式语言与自动机","面向对象程序设计实践（Java）"];
             var locations = ["S4-507","S4-306","S3-129","S4-453"];
-
+            
             for(var i = 0;i<7;i++){
                 totalrous[i] = new Array();
                 totalrous[i].push({

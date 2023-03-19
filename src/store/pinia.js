@@ -2,6 +2,12 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import { ElNotification } from "element-plus";
 
+const ClassData = {
+    title:"zjs",
+    type:0,
+    location:1,
+}
+
 const useLoginStore = defineStore('Login',{
     // 完整类型推断函数
     state:()=>{
@@ -97,7 +103,64 @@ const useTimeStore = defineStore('time',{
     }
 })
 
+const useNowrouStore = defineStore('nowrow',{
+    state:()=>{
+        return{
+            Nowrou:ClassData
+        }
+    }
+})
+
+const useMapStore = defineStore('map',{
+    state:()=>{
+        return{
+            // 这里根据图片原有尺寸和现在的视口比例确定定位信息
+            show:true,
+            mapx: 996,
+            mapy: 1195,
+            points:Object
+        }
+    },
+    actions:{
+        async GetPoints(){
+            let temp;
+            await axios.get("/api/Points.json").then(function(respose){
+                if(respose.status == 200){
+                    temp = respose.data
+                }else{
+                    console.log("请求异常");
+                }
+            })
+            this.points = temp
+        }
+    }
+})
+
+const useHitokotoStore = defineStore('hito',{
+    state:()=>{
+        return{
+            HitTip:Object
+        }
+    },
+    actions:{
+        async GetHito(){
+            let temp;
+            await axios.get("https://v1.hitokoto.cn/?encode=json&lang=cn").then(function(respose){
+                if(respose.status == 200){
+                        temp = respose.data
+                }
+            })
+            if(temp != null){
+                this.HitTip = temp
+            }
+        }
+    }
+})
+
 export{
     useLoginStore,
-    useTimeStore
+    useTimeStore,
+    useNowrouStore,
+    useMapStore,
+    useHitokotoStore
 }

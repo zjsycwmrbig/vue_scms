@@ -1,30 +1,28 @@
 <template>
     <div>
-        <slot/>
+        <el-card class="box-card">
+            <template #header>
+                <div class="card-header">
+                    <span>{{ store.Nowrou.title }}</span>
+                    <el-button class="button" text @click="store.Nowrou.title='zjsnb'">更改</el-button>
+                </div>
+            </template>
+        </el-card>
     </div>
-  {{name}}
 </template>
 
-<script>    
-    // import { useStore } from 'vuex'
-    import { computed } from 'vue'
+<script>
+import { useNowrouStore } from '@/store/pinia'
+export default {
+    name: 'NowRou',
+    setup() {
+        const store = useNowrouStore()
 
-    export default {
-        name:'NowRou',
-        setup(){
-            // const store = useStore()
-            // 计算属性
-            let name = computed(()=>{
-                return "zjs"
-                // return store.state.item
-            })
-            return{
-                name
-            }
+        return {
+            store
         }
     }
+}
 </script>
 
-<style>
-
-</style>
+<style></style>

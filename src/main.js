@@ -9,6 +9,7 @@ import './assets/common.css'
 // 创建挂载
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
+import "animate.css"
 const app = createApp(App)
 app.use(ElementPlus)
 // app.use(store)

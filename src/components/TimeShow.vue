@@ -1,6 +1,5 @@
 <template>
     <el-card>
-
         <el-popover placement="top" title="GOD OF TIME" :width="200" trigger="hover"
             content="点击修改时间">
             <template #reference>
@@ -42,7 +41,6 @@
                     </el-icon>
                 </el-button>
             </div>
-
         </div>
     </el-card>
 </template>
