@@ -8,7 +8,7 @@
       <NowRou/>
     </div>
     <div class="main">
-      <RouTable/>
+      <EventTable/>
     </div>
     <!-- 可以后期做成消息箱子 -->
     <TipsBox v-if="false"/>
@@ -21,10 +21,10 @@
 <script>
 import TipsBox from './components/TipsBox.vue'
 import HitoPart from './components/HitoPart.vue'
-import NowRou from './components/NowRou.vue'
+// import NowRou from './components/NowRou.vue'
 import UserBox from './components/UserBox.vue'
 import UserHeader from './components/UserHeader.vue'
-import RouTable from './components/RouTable.vue'
+import EventTable from './components/EventTable.vue'
 import TimeShow from './components/TimeShow.vue'
 import MapPart from './components/MapPart.vue'
 
@@ -33,9 +33,8 @@ export default {
   name: 'App',
   components: {
     UserHeader,
-    RouTable,
+    EventTable,
     UserBox,
-    NowRou,
     TipsBox,
     TimeShow,
     MapPart,

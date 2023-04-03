@@ -5,7 +5,7 @@
         enter-active-class="animate__animated animate__backInDown"
         leave-active-class="animate__animated animate__backOutUp"
       >
-    <div class="map">
+    <div class="map"  v-show="store.show">
         <el-popover
             v-for="item in store.points"
             :key="item.pid"
@@ -20,6 +20,7 @@
             </template>
         </el-popover>
         <img src="/api/map.png" alt="">
+        <el-button @click="store.show = false">收起地图</el-button>
     </div>
   </transition>
 </template>
@@ -32,8 +33,8 @@ import { useMapStore } from '@/store/pinia';
             store.GetPoints()
 //          四十是vw的比例
             function LocatePoint(item){
-                let top = (((item.y/store.mapy) * (40 * store.mapy / store.mapx)).toFixed(4)).toString()+'vw'
-                let left = (((item.x/store.mapx) * 40).toFixed(4)).toString()+'vw'
+                let top = (((item.y/store.mapy) * (40 * store.mapy / store.mapx)).toFixed(4)-0.3).toString()+'vw'
+                let left = (((item.x/store.mapx) * 40).toFixed(4)-0.3).toString()+'vw'
                 return {
                     top,
                     left
@@ -41,7 +42,7 @@ import { useMapStore } from '@/store/pinia';
             }
             return {
                 store,
-                LocatePoint
+                LocatePoint,
             }
         }
     }

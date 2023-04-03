@@ -3,7 +3,7 @@
         <el-card class="box-card">
             <template #header>
                 <div class="card-header">
-                    <span>{{ store.Nowrou.title }}</span>
+                    <span>{{ store.Nowrou.name }}</span>
                     <el-button class="button" text @click="store.Nowrou.title='zjsnb'">更改</el-button>
                 </div>
             </template>
@@ -12,14 +12,14 @@
 </template>
 
 <script>
-import { useNowrouStore } from '@/store/pinia'
+
 export default {
     name: 'NowRou',
     setup() {
-        const store = useNowrouStore()
+        
 
         return {
-            store
+            
         }
     }
 }

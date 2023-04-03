@@ -27,7 +27,7 @@
   </el-form>
 
     <div class="showbox" v-if="store.loginstate">
-        showbox
+        <button>jiayige</button>
     </div>
 </template>
 

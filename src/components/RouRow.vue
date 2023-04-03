@@ -9,25 +9,22 @@
         leave-active-class="animate__animated animate__backOutUp"
     >
         <!-- 这里的动画没效果 -->
-        <div class="card" v-for="item in items" :key="item.id" :style="SetStyle(item)" @click="ShowClass(item.name)">{{ item.name }}</div>
+        <div class="classcard" v-for="(item,index) in items" :key="index" :style="SetStyle(item)" @mouseenter="store.ShowItem(item)" @mouseout.stop="store.GetItem()">{{ item.name }}</div>
+
         </transition-group>
-        
     </div>
 </template>
 
 <script>
+import { useNowrouStore } from '@/store/pinia'
+
     export default {
         name:"RouRow",
         // 一个是数据,一个是标号
         props:['items','index'],
         // 映射到mutations
         setup(){
-            // 使用一个store对象
-            // const store = useStore()
-            let ShowClass = (item)=>{
-                console.log('调用',item)
-                // store.commit('SHOWCLASS',item)
-            }
+            const store = useNowrouStore()
             // 方法
             let SetStyle = (item)=>{
                 return {
@@ -36,10 +33,9 @@
                 }
             }
 
-
             return{
                 SetStyle,
-                ShowClass
+                store
             }
         }
     }
@@ -51,7 +47,7 @@
         height: 84vh;
         position: relative;
     }
-    .card{
+    .classcard{
         position: absolute;
         padding: 20px;
         border-radius: 4px;
@@ -59,7 +55,7 @@
         background-color: #fff;
         overflow: hidden;
     }
-    .card:hover{
+    .classcard:hover{
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
         
     }
