@@ -1,31 +1,34 @@
 <template>
-    <el-form
-    v-if="!store.loginstate"
-    ref="FormRef"
-    :model="Form"
-    status-icon
-    :rules="rules"
-    class="loginbox"
-    label-position="left"
-  >
-
-    <!-- 样式还得调整 -->
-    <el-form-item label="用户名" prop="user">
-      <el-input v-model="Form.user" autocomplete="off" style="width:80%;margin-left: 5%;"/>
-    </el-form-item>
-    <el-form-item label="密码 " prop="pass">
-      <el-input v-model="Form.pass" type="password" autocomplete="off" style="width:80%;margin-left: 5%;"/>
-    </el-form-item>
-    <el-form-item>
-      <div class="temp">
-        <el-button type="primary" @click="store.Login(Form.user,Form.pass)"
-        >登录</el-button
+    <el-card v-if="!store.loginstate">
+      <el-form
+        ref="FormRef"
+        :model="Form"
+        :rules="rules"
+        label-width="15%"
       >
-      <el-button @click="store.Register(Form.user,Form.pass)">注册</el-button>
-      </div>
-    </el-form-item>
-  </el-form>
+        <el-form-item label="账号" prop="user">
+          <el-input v-model="Form.user" autocomplete="off" style="width:80%;margin-left: 5%;"/>
+        </el-form-item>
 
+        <el-form-item label="密码" prop="pass">
+          <el-input v-model="Form.pass" type="password" autocomplete="off" style="width:80%;margin-left: 5%;"/>
+        </el-form-item>
+
+        <el-form-item label="昵称" v-if="Form.isRegister">
+          <el-input v-model="Form.name" type="text" style="width:80%;margin-left: 5%;"/>
+        </el-form-item>
+
+        <el-form-item label="签名" v-if="Form.isRegister">
+          <el-input v-model="Form.word" type="text" style="width:80%;margin-left: 5%;"/>
+        </el-form-item>
+
+        <el-row justify="space-around">
+            <el-button type="primary" @click="store.Login(Form.user,Form.pass)">登录</el-button>
+            <el-button @click="Form.isRegister=!Form.isRegister,store.Register(Form.user,Form.pass,Form.name,Form.word)" v-if="Form.isRegister">提交</el-button>
+            <el-button @click="Form.isRegister=!Form.isRegister" v-else>注册</el-button>
+        </el-row>
+      </el-form>
+    </el-card>
     <div class="showbox" v-if="store.loginstate">
         <button>jiayige</button>
     </div>
@@ -34,15 +37,18 @@
 <script>
     // 计算属性
     import { reactive} from 'vue'
-    import { useLoginStore } from '@/store/pinia'
+    import { useHitokotoStore, useLoginStore } from '@/store/pinia'
     export default {
         name:"UserData",
         setup(){
             const store = useLoginStore()
-
+            let hitostore = useHitokotoStore()
             let Form = reactive({
                 user:'',
-                pass:''
+                pass:'',
+                name:'',
+                word:hitostore.HitTip.hitokoto,
+                isRegister:false
             })
 
             const validatePass = (rule, value, callback) => {

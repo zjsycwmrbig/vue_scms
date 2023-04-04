@@ -5,30 +5,34 @@
     <div class="aside">
       <UserBox/>
       <TimeShow/>
-      <NowRou/>
+      <NowEvent/>
     </div>
     <div class="main">
       <EventTable/>
     </div>
-    <!-- 可以后期做成消息箱子 -->
+    <!-- 可以后期做成日志系统 -->
     <TipsBox v-if="false"/>
     <!-- 时间 -->
     <MapPart v-show="mapstore.show"/>
+    
   </div>
   <HitoPart/> 
+  <AddItem/>
 </template>
 
 <script>
 import TipsBox from './components/TipsBox.vue'
 import HitoPart from './components/HitoPart.vue'
-// import NowRou from './components/NowRou.vue'
 import UserBox from './components/UserBox.vue'
 import UserHeader from './components/UserHeader.vue'
 import EventTable from './components/EventTable.vue'
 import TimeShow from './components/TimeShow.vue'
 import MapPart from './components/MapPart.vue'
+import AddItem from './components/AddItem.vue'
+import NowEvent from './components/NowEvent.vue'
 
 import { useMapStore } from '@/store/pinia';
+
 export default {
   name: 'App',
   components: {
@@ -38,8 +42,10 @@ export default {
     TipsBox,
     TimeShow,
     MapPart,
-    HitoPart
-  },
+    HitoPart,
+    AddItem,
+    NowEvent
+},
   setup(){
     const mapstore = useMapStore();
     return{
@@ -63,6 +69,8 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  background: bisque url("assets/backgroud.jpg") ;
+  background-size:200px auto;
 }
 .container .aside{
   padding: 10px;

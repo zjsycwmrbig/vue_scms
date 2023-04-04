@@ -3,10 +3,10 @@
     <div class="text">
         {{weekday}}
     </div>
-    <div class="eventshow" v-if="store.show">
+    <div class="eventshow">
         <!-- 这是显示每个信息的地方 -->
         <div class="eventbox">
-            <div class="eventcard" v-for="(item,itemIndex) in weekdata" :key="itemIndex" :style="SetItem(item)">
+            <div class="eventcard" v-for="(item,itemIndex) in weekdata" :key="itemIndex" :style="SetItem(item)" @mouseenter="store.eventshow=false,store.showevent=item" @mouseleave="store.eventshow=true">
             <el-text truncated="true">
                 {{ item.title }}
             </el-text>

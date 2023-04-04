@@ -71,7 +71,7 @@ const useLoginStore = defineStore('Login',{
                 })
             }
         },
-        async Register(user,pass){
+        async Register(user,pass,name,word){
             if(user==""||pass==""){
                 // 用户名
                 ElNotification({
@@ -83,7 +83,9 @@ const useLoginStore = defineStore('Login',{
             }else{
                 await axios.post('/api/user/register',{
                     username:user,
-                    password:pass
+                    password:pass,
+                    netname:name,
+                    personalwoed:word
                 }).then(function(respose){
                     if(respose.status == 200){
                         if(respose.data.state == "注册成功"){
@@ -94,7 +96,6 @@ const useLoginStore = defineStore('Login',{
                                 position:"bottom-right"
                             })
                         }
-                            
                     }
                 })
             }
@@ -118,7 +119,9 @@ const useEventTableStore = defineStore('eventtable',{
             show:false,
             eventData:Object,//接收到的数据,按照时间分类
             weekData:Array,//星期数组类型
-            demoData:["a","b","c","d","e"]
+            nowevent:Object,//显示当下事件
+            showevent:Object,//显示hover时的事件
+            eventshow:true
         }
     },
     actions:{
@@ -147,19 +150,29 @@ const useMapStore = defineStore('map',{
             show:false,
             mapx: 996,
             mapy: 1195,
-            points:Object
+            points:Object,
+            mapForm:{
+                selected:false,
+                location:-1,
+                formshow:true
+            }
         }
     },
     actions:{
         async GetPoints(){
             let temp;
-            await axios.get("/api/Points.json").then(function(respose){
+            await axios.get("/api/Points.json",{
+                params:{
+                    t:new Date().getTime()
+                }
+            }).then(function(respose){
                 if(respose.status == 200){
                     temp = respose.data
                 }else{
                     console.log("请求异常");
                 }
             })
+            this.points = null
             this.points = temp
         }
     }
