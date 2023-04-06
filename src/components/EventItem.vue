@@ -6,11 +6,11 @@
     <div class="eventshow">
         <!-- 这是显示每个信息的地方 -->
         <div class="eventbox">
-            <div class="eventcard" v-for="(item,itemIndex) in weekdata" :key="itemIndex" :style="SetItem(item)" @mouseenter="store.eventshow=false,store.showevent=item" @mouseleave="store.eventshow=true">
-            <el-text truncated="true">
-                {{ item.title }}
-            </el-text>
-        </div>
+            <div class="eventcard" v-for="(item,itemIndex) in weekdata" :key="itemIndex" :style="SetItem(item)" @mouseenter="store.eventShow = false;store.showEvent = item" @mouseleave="store.eventShow = true">
+                <el-text truncated="true" >
+                    {{ item.title }}
+                </el-text>
+            </div>
         </div>
     </div>
   </div>

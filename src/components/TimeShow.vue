@@ -11,8 +11,13 @@
         
         <el-divider />
         <div class="speed" v-show="show" :class="{ change: disabled }">
-            <el-text>时间倍速</el-text>
-            <el-slider v-model="store.Timespeed" max="1000" show-input />
+            
+            <div v-show="!pause">
+                <el-text>时间倍速</el-text>
+                <el-slider v-model="store.Timespeed" max="1000" show-input />
+                <el-divider />
+            </div>
+
             <div class="options">
                 <el-button @click="ChangeDate(-7)">
                     <el-icon size="20" color="#0000000">
@@ -47,12 +52,13 @@
 
 <script>
 import { ref } from 'vue'
-import { useTimeStore } from '@/store/pinia';
+import { useEventTableStore, useTimeStore } from '@/store/pinia';
 export default {
     setup() {
-        const DAY = 1000 * 60 * 60 * 24;
+        let event = useEventTableStore()
+        const DAY = 1000 * 60 * 60 * 24;//一天的毫秒数
         const store = useTimeStore();
-        store.GlobalTime = new Date();
+        store.GlobalTime = new Date();//新建时间
         const disabled = ref(false)
         const show = ref(false)
         //      切换卡片特效
@@ -63,28 +69,46 @@ export default {
                 disabled.value = false
             }, 1500)
         }
-
+        let tempSpeed = store.tempSpeed
 
         //      模拟自定义时钟
         const pause = ref(false)
-        let timer = setInterval(() => {
-            store.GlobalTime = new Date(store.GlobalTime.getTime() + 1000 * store.Timespeed)
-        }, 1000)
-
+        
+        setInterval(() => {
+            try{
+                store.GlobalTime = new Date(store.GlobalTime.getTime() + 17 * store.Timespeed)
+                if(store.GlobalTime.getDay() == 1){
+                    if(store.GlobalTime.getTime() < store.Timespeed * 17 * 3){
+                        event.GetWeekData() //更新数据
+                    }
+                }
+            }catch(e){
+                store.Timespeed = 1
+            }
+            
+        }, 17)
+        // 暂停键
         function PauseTime() {
             if (pause.value) {
-                timer = setInterval(() => {
-                    store.GlobalTime = new Date(store.GlobalTime.getTime() + 1000 * store.Timespeed)
-                }, 1000)
+                store.Timespeed = tempSpeed
             } else {
-                clearTimeout(timer)
+                tempSpeed = store.Timespeed
+                store.Timespeed = 0;
             }
             pause.value = !pause.value
         }
         //      改变日期
+        
+        //      跳跃式改变日期
         function ChangeDate(det) {
+            let next = (store.GlobalTime.getDay()+6)%7+det
+            if(next < 0 || next > 6){
+                // 跳跃式更新到下一周
+                event.GetWeekData()
+            }
             store.GlobalTime = new Date(store.GlobalTime.getTime() + DAY * det)
         }
+
         return {
             store,
             ChangeCard,

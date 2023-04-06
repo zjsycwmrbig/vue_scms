@@ -40,7 +40,7 @@ const useLoginStore = defineStore('Login',{
                     {
                         // 请求成功
                         if(respose.data.state == "登录成功"){
-                            store.GetWeekData()//获取数据
+                            store.GetWeekData()  //登录成功获取一次数据
                             ElNotification({
                                 title:"登录成功",
                                 message:"尊敬的xxx,您好",
@@ -108,27 +108,61 @@ const useTimeStore = defineStore('time',{
     state:()=>{
         return{
             GlobalTime:Date,
-            Timespeed:1//正常速率
+            Timespeed:1,         //正常速率
         }
+    },
+    actions:{
+        // 定位目前Item顺序,按照一定比例定位
+        LocateItem(){
+            let event = useEventTableStore()
+            let weekIndex = (this.GlobalTime.getDay() + 6) % 7
+            
+            let progress = 0 //进度
+            let nowTime = this.GlobalTime.getTime()
+            // 判定是否有
+            if(event.weekData[weekIndex].list == null){
+                return;
+            }
+
+            let i = 0;
+            let existFlag = false;
+            // 遍历找到可能是下一个或者这一个
+            for(;i < event.weekData[weekIndex].list.length;i++){
+                existFlag = true;
+                if( nowTime <= event.weekData[weekIndex].list[i].begin + event.weekData[weekIndex].list[i].length) break;
+            }
+            // 标记现在没有点位在路线上
+            if(existFlag && i != event.weekData[weekIndex].list.length ){
+                progress = ((nowTime - event.weekData[weekIndex].list[i].begin) / parseFloat(event.weekData[weekIndex].list[i].length)).toFixed(5)
+                event.nowEvent.item = event.weekData[weekIndex].list[i]
+                event.nowEvent.progress = progress
+            }else{
+                event.nowEvent.item = null
+                event.nowEvent.progress = -1
+            }
+        },
+
     }
+
 })
 
 const useEventTableStore = defineStore('eventtable',{
     state:()=>{
         return{
-            show:false,
+            eventShow:true,
             eventData:Object,//接收到的数据,按照时间分类
             weekData:Array,//星期数组类型
-            nowevent:Object,//显示当下事件
-            showevent:Object,//显示hover时的事件
-            eventshow:true
+            nowEvent:{
+                item:Object,
+                progress:Number
+            },//显示当下事件
+            showEvent:Object,//显示hover时的事件
         }
     },
     actions:{
-        async GetWeekData(){
+        GetWeekData(){
             let store = useTimeStore()
-            console.log(store.GlobalTime.getTime());
-            await axios.get('/api/query/now',{
+            axios.get('/api/query/now',{
                 params:{
                     date:store.GlobalTime.getTime()
                 }
@@ -136,7 +170,6 @@ const useEventTableStore = defineStore('eventtable',{
                 let event = useEventTableStore()
                 event.eventData = respose.data.events;
                 event.weekData = respose.data.routines;//数组,包含index和数据
-                console.log(event.weekData[2].list[0].begin);
                 event.show = true;
             })
         }
