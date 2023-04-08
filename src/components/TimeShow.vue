@@ -83,7 +83,7 @@ export default {
                     }
                 }
             }catch(e){
-                store.Timespeed = 1
+                console.log("系统错误");
             }
             
         }, 17)

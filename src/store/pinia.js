@@ -7,8 +7,7 @@ const useLoginStore = defineStore('Login',{
     // 完整类型推断函数
     state:()=>{
         return{
-            loginstate:0,
-            username:"zj"
+            loginstate:0
             // 提示词
         }
     },
@@ -153,7 +152,7 @@ const useEventTableStore = defineStore('eventtable',{
             eventData:Object,//接收到的数据,按照时间分类
             weekData:Array,//星期数组类型
             nowEvent:{
-                item:Object,
+                item:null,
                 progress:Number
             },//显示当下事件
             showEvent:Object,//显示hover时的事件

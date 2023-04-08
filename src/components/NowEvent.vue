@@ -1,33 +1,41 @@
 <template>
     <div>
-        <el-card class="box-card" v-show="store.eventShow">
+        <div class="now">
+            <el-progress v-if="store.nowEvent.item != null" :percentage="store.nowEvent.progress" :show-text="false" :stroke-linecap="butt"/>
+            <el-card class="box-card" v-show="store.eventShow">
             <template #header>
                 <div class="card-header">
                     <span>{{ store.nowEvent.item == null ? "今日无事": store.nowEvent.item.title}}</span>
-                    <span>{{ store.nowEvent.progress }}</span>
+                    <span>{{ store.nowEvent.item == null ? "": store.nowEvent.progress }}</span>
                 </div>
             </template>
         </el-card>
-        <el-card class="box-card" v-show="!store.eventShow">
+        </div>
+        <div class="show">
+            <el-card class="box-card" v-show="!store.eventShow">
             <template #header>
                 <div class="card-header">
                     <span>{{ store.showEvent.title }}</span>
                 </div>
             </template>
         </el-card>
+        </div>
     </div>
 </template>
 
 <script>
-import { useEventTableStore, useTimeStore } from '@/store/pinia'
+import { useEventTableStore, useLoginStore,useTimeStore } from '@/store/pinia'
 export default {
     name: 'NowEvnet',
     setup() {
         let store = useEventTableStore()
         let time =  useTimeStore()
-        // let state = useLoginStore()
+        let state = useLoginStore()
         setInterval(()=>{
-            time.LocateItem()//更新store中的数据
+            if(state.loginstate == 1){
+                time.LocateItem()//更新store中的数据
+            }
+            
         },17)
         return {
             store
