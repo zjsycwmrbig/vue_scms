@@ -159,11 +159,12 @@ const useEventTableStore = defineStore('eventtable',{
         }
     },
     actions:{
+        // 批量请求数据
         GetWeekData(){
-            let store = useTimeStore()
+            let Timestore = useTimeStore()
             axios.get('/api/query/now',{
                 params:{
-                    date:store.GlobalTime.getTime()
+                    date:Timestore.GlobalTime
                 }
             }).then(function(respose){
                 let event = useEventTableStore()

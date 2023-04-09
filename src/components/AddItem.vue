@@ -5,7 +5,7 @@
         leave-active-class="animate__animated animate__backOutUp"
       >
 
-    <div class="form" v-show="false">
+    <div class="form" v-show="fal">
       <!-- 步骤条 -->
       <el-steps direction="vertical" :active="1" class="step">
         <el-step title="Step 1" />

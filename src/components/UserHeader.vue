@@ -1,19 +1,25 @@
 <template>
     <div class="Head">
-        {{ msg }}
-        <div class="option">
-            <el-button type="primary">
-            New<el-icon class="el-icon--right"><Upload /></el-icon>
-            </el-button>
-        </div>
+        <el-row>
+            <el-col :span="20">
+                {{ msg }}
+            </el-col>
+            <el-col :span="3">
+                <AvatarPart/>
+            </el-col>
+        </el-row>
     </div>
 </template>
 
 <script>
 
 import { ref } from 'vue'
+import AvatarPart from './AvatarPart.vue'
     export default {
         name:"UserHeader",
+        components:{
+            AvatarPart
+        },
         setup(){
             
             let msg = ref("SCMS-在路上")
@@ -25,12 +31,5 @@ import { ref } from 'vue'
 </script>
 
 <style scoped>
-    .Head{
-        display: relative;
-        background-color: #ccc;
-    }
-    .option{
-        display: absolute;
-        right: 1vw;
-    }
+    
 </style>

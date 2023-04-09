@@ -1,23 +1,32 @@
 <template>
   <!-- 使用EL布局 -->
-  <UserHeader/>
-  <div class="container">
-    <div class="aside">
+  
+  <div class="userbox" v-if="!loginStore.loginstate"><!--登录不成功-->
       <UserBox/>
-      <TimeShow/>
-      <NowEvent/>
-    </div>
-    <div class="main">
-      <EventTable/>
-    </div>
-    <!-- 可以后期做成日志系统 -->
-    <TipsBox v-if="false"/>
-    <!-- 时间 -->
-    <MapPart v-show="mapstore.show"/>
-    
   </div>
-  <HitoPart/> 
-  <AddItem/>
+  <div v-else><!--登录成功-->
+    <UserHeader/>
+
+    <el-row >
+      <el-col :span="5">
+        <TimeShow/>
+        <NowEvent/>
+      </el-col>
+      <el-col :span="17">
+        <EventTable/>
+      </el-col>
+    </el-row>
+
+    <!-- 可以后期做成日志系统  -->
+    <TipsBox v-if="false"/>
+    <!-- 时间  -->
+    <MapPart v-show="mapstore.show"/> 
+  </div>
+
+  <div class="HitoPart">
+    <HitoPart/> 
+  </div>
+  <AddItem v-if="false"/>
 </template>
 
 <script>
@@ -31,7 +40,8 @@ import MapPart from './components/MapPart.vue'
 import AddItem from './components/AddItem.vue'
 import NowEvent from './components/NowEvent.vue'
 
-import { useMapStore } from '@/store/pinia';
+import { useLoginStore, useMapStore, useTimeStore } from '@/store/pinia';
+
 
 export default {
   name: 'App',
@@ -44,34 +54,50 @@ export default {
     MapPart,
     HitoPart,
     AddItem,
-    NowEvent
+    NowEvent,
 },
   setup(){
     const mapstore = useMapStore();
+    const loginStore = useLoginStore();
+    const timeStore = useTimeStore()
+    
+    timeStore.GlobalTime = Date.now()
+    
     return{
       mapstore,
+      loginStore
     }
   }
 }
 </script>
 
-<style> 
+<style scoped> 
 /* 页面属性 */
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
+  width: 100%;
+  height: 100%;
 }
-.container{
-  position: relative;
-  margin-top: 10px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  background: bisque url("assets/backgroud.jpg") ;
-  background-size:200px auto;
+
+.userbox{
+  width: 100vw;
+  height: 100vh;
+  background-image: url(@/assets/byBackground.jpg);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size:auto 100vh;
 }
+
+.HitoPart{
+  position: fixed;
+  left: 50%;
+  bottom: 1vh;
+  transform: translateX(-50%);
+}
+
 .container .aside{
   padding: 10px;
   display: flex;
