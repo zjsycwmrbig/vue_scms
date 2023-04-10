@@ -1,7 +1,13 @@
 <template>
     <div class="Head">
-        <el-row align="middle">
-            <el-col :span="20">
+        <el-row align="middle" gutter="20"> 
+            <!-- 关闭/开启功能区 -->
+            <el-col :span="2">
+                <el-button size="large" @click="asideStore.show = !asideStore.show">
+                    <el-icon><Operation /></el-icon>
+                </el-button>
+            </el-col>
+            <el-col :span="18">
                 <el-text>{{ msg }}</el-text>
             </el-col>
             <el-col :span="3">
@@ -15,16 +21,18 @@
 
 import { ref } from 'vue'
 import AvatarPart from './AvatarPart.vue'
+import { useAsideStore } from '@/store/pinia'
     export default {
         name:"UserHeader",
         components:{
             AvatarPart
         },
         setup(){
-            
+            let asideStore = useAsideStore()
             let msg = ref("SCMS-在路上")
             return{
-                msg
+                msg,
+                asideStore
             }
         }
     }

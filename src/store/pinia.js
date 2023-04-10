@@ -232,15 +232,18 @@ const useHitokotoStore = defineStore('hito',{
     }
 })
 
-const useClassStore = defineStore('class',{
-    
+const useAsideStore = defineStore('aside',{
+    state:()=>{
+        return{
+            show:true,
+        }
+    },
 })
-
 export{
     useLoginStore,
     useTimeStore,
     useEventTableStore,
     useMapStore,
     useHitokotoStore,
-    useClassStore
+    useAsideStore
 }

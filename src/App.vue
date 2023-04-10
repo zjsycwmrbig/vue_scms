@@ -1,27 +1,22 @@
 <template>
-  <!-- 使用EL布局 -->
-  
   <div class="userbox" v-if="!loginStore.loginstate"><!--登录不成功-->
       <UserBox/>
   </div>
   <div v-else><!--登录成功-->
     <UserHeader/>
+    <el-divider />
     <el-row>
       <!-- 侧边栏 -->
       <AsidePart></AsidePart>
       <!-- 主展示区 -->
       <MainPart/>
     </el-row>
-    <!-- 可以后期做成日志系统  -->
-    <TipsBox v-if="false"/>
-    <!-- 时间  -->
-    <MapPart v-show="mapstore.show"/> 
+    <MapPart v-show="true"/> 
   </div>
 
   <div class="HitoPart">
     <HitoPart/> 
   </div>
-  <AddItem v-if="false"/>
 </template>
 
 <script>

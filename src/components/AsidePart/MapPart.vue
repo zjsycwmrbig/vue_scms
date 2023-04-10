@@ -2,8 +2,8 @@
 
 <transition  appear
         name="map_animate"
-        enter-active-class="animate__animated animate__backInDown"
-        leave-active-class="animate__animated animate__backOutUp"
+        enter-active-class="animate__animated animate__slideInRight"
+        leave-active-class="animate__animated animate__slideOutRight"
       >
     <div class="map"  v-show="store.show">
         <div v-for="item in store.points" :key="item.pid">
@@ -61,8 +61,9 @@ import { useMapStore } from '@/store/pinia';
 <style scoped>
 .map{
     position: fixed;
-    top: 5%;
-    left: 30%;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0;
     width: 40vw;
 }
 .map img{
