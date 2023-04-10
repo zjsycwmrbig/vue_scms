@@ -1,11 +1,12 @@
 <template>
-
-<transition  appear
-        name="map_animate"
-        enter-active-class="animate__animated animate__slideInRight"
-        leave-active-class="animate__animated animate__slideOutRight"
-      >
-    <div class="map"  v-show="store.show">
+      <el-drawer
+        v-model="store.show"
+        title="地图"
+        :show-close="false"
+        class="mapdrawer"
+        :size="'45%'"
+    >
+    <div class="map">
         <div v-for="item in store.points" :key="item.pid">
             <el-popover
             placement="top"
@@ -14,16 +15,13 @@
             trigger="hover"
         >
             <template #reference>
-                <!-- 小圆点 -->
-                <div :class="PointStyle(item)" :style="LocatePoint(item)" @click="store.mapForm.location = item.pid,store.mapForm.selected=true,store.show=false,store.mapForm.formshow = true"></div>
+                <div :class="PointStyle(item)" :style="LocatePoint(item)" @click="store.mapForm.location = item.pid,store.mapForm.selected=true,store.show=false"></div>
             </template>
         </el-popover>
         </div>
-        
         <img src="/api/map.png" alt="">
-        <el-button @click="store.show = false">收起地图</el-button>
     </div>
-  </transition>
+  </el-drawer>
 </template>
 
 <script>
@@ -60,10 +58,7 @@ import { useMapStore } from '@/store/pinia';
 
 <style scoped>
 .map{
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    right: 0;
+    position: relative;
     width: 40vw;
 }
 .map img{

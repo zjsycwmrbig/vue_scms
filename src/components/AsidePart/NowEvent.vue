@@ -24,18 +24,17 @@
 </template>
 
 <script>
-import { useEventTableStore, useLoginStore,useTimeStore } from '@/store/pinia'
+import { useEventTableStore, useLoginStore, useTimeStore } from '@/store/pinia'
 export default {
     name: 'NowEvnet',
     setup() {
         let store = useEventTableStore()
-        let time =  useTimeStore()
         let state = useLoginStore()
+        let time = useTimeStore()
         setInterval(()=>{
             if(state.loginstate == 1){
-                time.LocateItem()//更新store中的数据
-            }
-            
+            time.LocateItem()//更新store中的数据
+        }
         },17)
         return {
             store

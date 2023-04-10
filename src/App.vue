@@ -4,15 +4,15 @@
   </div>
   <div v-else><!--登录成功-->
     <UserHeader/>
-    <el-divider />
     <el-row>
       <!-- 侧边栏 -->
-      <AsidePart></AsidePart>
+      <AsidePart/>
       <!-- 主展示区 -->
       <MainPart/>
     </el-row>
     <MapPart v-show="true"/> 
     <OperationPart/>
+    <AddItem/>
   </div>
 
   <div class="HitoPart">
@@ -28,7 +28,8 @@ import MapPart from './components/AsidePart/MapPart.vue'
 import AsidePart from './components/AsidePart/AsidePart.vue'
 import MainPart from './components/MainPart/MainPart.vue'
 import OperationPart from './components/OperationPart/OperationPart.vue'
-import { useLoginStore, useMapStore, useTimeStore } from '@/store/pinia';
+import AddItem from './components/OperationPart/AddItem.vue'
+import { useLoginStore, useMapStore,useTimeStore } from '@/store/pinia';
 
 export default {
   name: 'App',
@@ -39,15 +40,16 @@ export default {
     HitoPart,
     AsidePart,
     MainPart,
-    OperationPart
+    OperationPart,
+    AddItem
 },
   setup(){
     const mapstore = useMapStore();
     const loginStore = useLoginStore();
+    // 开始时间
     const timeStore = useTimeStore()
+    timeStore.BeginTime()
     // 初始化时间
-    timeStore.GlobalTime = Date.now()
-    
     return{
       mapstore,
       loginStore

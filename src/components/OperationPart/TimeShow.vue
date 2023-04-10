@@ -56,8 +56,8 @@ export default {
     setup() {
         let event = useEventTableStore()
         const DAY = 1000 * 60 * 60 * 24;//一天的毫秒数
-        const store = useTimeStore();
-        store.GlobalTime = new Date();//新建时间
+        let store = useTimeStore();
+        // store.BeginTime()
         const disabled = ref(false)
         const show = ref(false)
         //      切换卡片特效
@@ -73,19 +73,7 @@ export default {
         //      模拟自定义时钟
         const pause = ref(false)
         
-        setInterval(() => {
-            try{
-                store.GlobalTime = new Date(store.GlobalTime.getTime() + 17 * store.Timespeed)
-                if(store.GlobalTime.getDay() == 1){
-                    if(store.GlobalTime.getTime() < store.Timespeed * 17 * 3){
-                        event.GetWeekData() //更新数据
-                    }
-                }
-            }catch(e){
-                console.log("系统错误");
-            }
-            
-        }, 17)
+        
         // 暂停键
         function PauseTime() {
             if (pause.value) {

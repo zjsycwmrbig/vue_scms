@@ -7,7 +7,8 @@ const useLoginStore = defineStore('Login',{
     // 完整类型推断函数
     state:()=>{
         return{
-            loginstate:0
+            loginstate:0,
+            userData:Object
             // 提示词
         }
     },
@@ -40,9 +41,11 @@ const useLoginStore = defineStore('Login',{
                         // 请求成功
                         if(respose.data.state == "登录成功"){
                             store.GetWeekData()  //登录成功获取一次数据
+                            login.userData = respose.data;
+                            console.log(login.userData);
                             ElNotification({
                                 title:"登录成功",
-                                message:"尊敬的xxx,您好",
+                                message:"尊敬的"+respose.data.netname+",您好",
                                 type:"success",
                                 position:"bottom-right"
                             })
@@ -111,9 +114,24 @@ const useTimeStore = defineStore('time',{
         }
     },
     actions:{
+        BeginTime(){
+            let event = useEventTableStore()
+            // 开始时间并且定位进度
+            this.GlobalTime = new Date()
+            setInterval(() => {
+                this.GlobalTime = new Date(this.GlobalTime.getTime() + 17 * this.Timespeed)
+                if(this.GlobalTime.getDay() == 1){
+                    if(this.GlobalTime.getTime() < this.Timespeed * 17 * 3){
+                        event.GetWeekData() //更新数据
+                    }
+                }
+                
+            }, 17)
+        },
         // 定位目前Item顺序,按照一定比例定位
         LocateItem(){
             let event = useEventTableStore()
+
             let weekIndex = (this.GlobalTime.getDay() + 6) % 7
             
             let progress = 0 //进度
@@ -164,13 +182,42 @@ const useEventTableStore = defineStore('eventtable',{
             let Timestore = useTimeStore()
             axios.get('/api/query/now',{
                 params:{
-                    date:Timestore.GlobalTime
+                    date:Timestore.GlobalTime.getTime()
                 }
             }).then(function(respose){
                 let event = useEventTableStore()
                 event.eventData = respose.data.events;
                 event.weekData = respose.data.routines;//数组,包含index和数据
                 event.show = true;
+            })
+        },
+         AddItem(form){
+            let event = useEventTableStore()
+             axios.post('/api/add/item',{
+                type:form.type,
+                title:form.name,
+                location:form.location,
+                circle:form.circle,
+                begin:form.date2.getTime(),
+                end:form.end==''?form.date2.getTime()+form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000:form.end.getTime(),
+                length:form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000
+            }).then(function(respose){
+                if(respose.data.res == true){
+                    ElNotification({
+                        title:"添加数据成功",
+                        message:"对比"+respose.data.clashList.length+"页数据,无冲突数据",
+                        type:"success",
+                        position:"bottom-right"
+                    })
+                    event.GetWeekData()
+                }else{
+                    ElNotification({
+                        title:"添加数据失败",
+                        message:"请求数据出错",
+                        type:"error",
+                        position:"bottom-right"
+                    })
+                }
             })
         }
     }
@@ -231,14 +278,16 @@ const useHitokotoStore = defineStore('hito',{
         }
     }
 })
-
+// 关于抽屉等的开关
 const useOperationStore = defineStore('aside',{
     state:()=>{
         return{
-            show:false,
+            operationShow:false,
+            addShow:false
         }
     },
 })
+
 export{
     useLoginStore,
     useTimeStore,
