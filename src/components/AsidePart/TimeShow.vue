@@ -1,22 +1,20 @@
 <template>
     <el-card>
-        <el-popover placement="top" title="GOD OF TIME" :width="200" trigger="hover"
-            content="点击修改时间">
-            <template #reference>
-                <div class="time" @click="ChangeCard">
+        <div class="time" @click="ChangeCard">
                 {{ store.GlobalTime }}
-                </div>    
-            </template>
-        </el-popover>
-        
+        </div>    
         <el-divider />
-        <div class="speed" v-show="show" :class="{ change: disabled }">
-            
+        <transition  appear
+        name="map_animate"
+        enter-active-class="animate__animated animate__slideInLeft"
+        leave-active-class="animate__animated animate__slideOutLeft"
+        >
+        <div class="speed" v-show="show">
             <div v-show="!pause">
                 <el-text>时间倍速</el-text>
                 <el-slider v-model="store.Timespeed" max="1000" show-input />
                 <el-divider />
-            </div>
+        </div>
 
             <div class="options">
                 <el-button @click="ChangeDate(-7)">
@@ -47,6 +45,7 @@
                 </el-button>
             </div>
         </div>
+        </transition>
     </el-card>
 </template>
 
@@ -122,7 +121,8 @@ export default {
 }
 </script>
 
-<style scoped> .time:hover {
+<style scoped> 
+.time:hover {
      cursor: pointer;
  }
 
@@ -132,32 +132,4 @@ export default {
      justify-content: center;
  }
 
- .change {
-     animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-     transform: translate3d(0, 0, 0);
- }
-
- @keyframes shake {
-
-     10%,
-     90% {
-         transform: translate3d(-1px, 0, 0);
-     }
-
-     20%,
-     80% {
-         transform: translate3d(2px, 0, 0);
-     }
-
-     30%,
-     50%,
-     70% {
-         transform: translate3d(-4px, 0, 0);
-     }
-
-     40%,
-     60% {
-         transform: translate3d(4px, 0, 0);
-     }
- }
 </style>

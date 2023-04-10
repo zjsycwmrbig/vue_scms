@@ -232,10 +232,10 @@ const useHitokotoStore = defineStore('hito',{
     }
 })
 
-const useAsideStore = defineStore('aside',{
+const useOperationStore = defineStore('aside',{
     state:()=>{
         return{
-            show:true,
+            show:false,
         }
     },
 })
@@ -245,5 +245,5 @@ export{
     useEventTableStore,
     useMapStore,
     useHitokotoStore,
-    useAsideStore
+    useOperationStore
 }

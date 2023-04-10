@@ -12,6 +12,7 @@
       <MainPart/>
     </el-row>
     <MapPart v-show="true"/> 
+    <OperationPart/>
   </div>
 
   <div class="HitoPart">
@@ -26,6 +27,7 @@ import UserHeader from './components/HeadPart/UserHeader.vue'
 import MapPart from './components/AsidePart/MapPart.vue'
 import AsidePart from './components/AsidePart/AsidePart.vue'
 import MainPart from './components/MainPart/MainPart.vue'
+import OperationPart from './components/OperationPart/OperationPart.vue'
 import { useLoginStore, useMapStore, useTimeStore } from '@/store/pinia';
 
 export default {
@@ -36,7 +38,8 @@ export default {
     MapPart,
     HitoPart,
     AsidePart,
-    MainPart
+    MainPart,
+    OperationPart
 },
   setup(){
     const mapstore = useMapStore();

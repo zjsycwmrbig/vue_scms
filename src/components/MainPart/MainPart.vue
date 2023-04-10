@@ -1,5 +1,5 @@
 <template>
-  <el-col :span="15" :offset="2">
+  <el-col :span="14" :offset="1">
         <EventTable/>
     </el-col>
 </template>
