@@ -6,16 +6,12 @@
   </div>
   <div v-else><!--登录成功-->
     <UserHeader/>
-
-    <el-row justify="space-around">
+    <el-row>
       <!-- 侧边栏 -->
       <AsidePart></AsidePart>
       <!-- 主展示区 -->
-      <el-col :span="15">
-        <EventTable/>
-      </el-col>
+      <MainPart/>
     </el-row>
-
     <!-- 可以后期做成日志系统  -->
     <TipsBox v-if="false"/>
     <!-- 时间  -->
@@ -29,37 +25,29 @@
 </template>
 
 <script>
-import TipsBox from './components/TipsBox.vue'
-import HitoPart from './components/HitoPart.vue'
-import UserBox from './components/UserBox.vue'
-import UserHeader from './components/UserHeader.vue'
-import EventTable from './components/EventTable.vue'
-// import TimeShow from './components/TimeShow.vue'
-import MapPart from './components/MapPart.vue'
-import AddItem from './components/AddItem.vue'
-// import NowEvent from './components/NowEvent.vue'
-import AsidePart from './components/AsidePart.vue'
-
+import HitoPart from './components/FootPart/HitoPart.vue'
+import UserBox from './components/PrePart/UserBox.vue'
+import UserHeader from './components/HeadPart/UserHeader.vue'
+import MapPart from './components/AsidePart/MapPart.vue'
+import AsidePart from './components/AsidePart/AsidePart.vue'
+import MainPart from './components/MainPart/MainPart.vue'
 import { useLoginStore, useMapStore, useTimeStore } from '@/store/pinia';
-
 
 export default {
   name: 'App',
   components: {
     UserHeader,
-    EventTable,
     UserBox,
-    TipsBox,
     MapPart,
     HitoPart,
-    AddItem,
-    AsidePart
+    AsidePart,
+    MainPart
 },
   setup(){
     const mapstore = useMapStore();
     const loginStore = useLoginStore();
     const timeStore = useTimeStore()
-    
+    // 初始化时间
     timeStore.GlobalTime = Date.now()
     
     return{
@@ -96,18 +84,5 @@ export default {
   bottom: 1vh;
   transform: translateX(-50%);
 }
-
-/* .container .aside{
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border: 1px solid #ccc;
-  width: 30%;
-}
-.container .main{
-  border: 1px solid #ccc;
-  width: 65%;
-} */
 
 </style>

@@ -1,9 +1,10 @@
 <template>
-    <el-col :span="5">
+    <el-col :span="5" :offset="1">
         <el-space
             fill
             direction="vertical"
             size="large"
+            class="aside"
         >
             <el-row justify="end" >
                 <el-col :offset="20" :span="4">
@@ -32,6 +33,10 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.aside{
+    border: 2px blanchedalmond solid;
+    padding: 2px;
+}
 
 </style>
