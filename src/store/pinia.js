@@ -150,7 +150,7 @@ const useTimeStore = defineStore('time',{
             }
             // 标记现在没有点位在路线上
             if(existFlag && i != event.weekData[weekIndex].list.length ){
-                progress = ((nowTime - event.weekData[weekIndex].list[i].begin) / parseFloat(event.weekData[weekIndex].list[i].length)).toFixed(5)
+                progress = (((nowTime - event.weekData[weekIndex].list[i].begin)*100 / parseFloat(event.weekData[weekIndex].list[i].length))).toFixed(1)
                 event.nowEvent.item = event.weekData[weekIndex].list[i]
                 event.nowEvent.progress = progress
             }else{
@@ -158,9 +158,7 @@ const useTimeStore = defineStore('time',{
                 event.nowEvent.progress = -1
             }
         },
-
     }
-
 })
 
 const useEventTableStore = defineStore('eventtable',{
@@ -269,7 +267,7 @@ const useHitokotoStore = defineStore('hito',{
             let temp;
             await axios.get("https://v1.hitokoto.cn/?encode=json&lang=cn").then(function(respose){
                 if(respose.status == 200){
-                        temp = respose.data
+                    temp = respose.data
                 }
             })
             if(temp != null){
@@ -278,6 +276,7 @@ const useHitokotoStore = defineStore('hito',{
         }
     }
 })
+
 // 关于抽屉等的开关
 const useOperationStore = defineStore('aside',{
     state:()=>{
@@ -296,3 +295,4 @@ export{
     useHitokotoStore,
     useOperationStore
 }
+

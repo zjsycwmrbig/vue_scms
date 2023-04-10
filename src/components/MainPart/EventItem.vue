@@ -25,8 +25,9 @@ import { useEventTableStore } from '@/store/pinia'
 
             let SetItem = (item)=>{
                 return {
-                    height:Math.round((item.begin % 86400000)/86400000,3)+'%',
-                    top:Math.round(item.length / 86400000,3)+'%'
+                    height:(item.length*100 / parseFloat(86400000)).toFixed(2) + '%' ,
+                    top:(item.begin % 86400000) * 100 / parseFloat(86400000).toFixed(2)+'%',
+                    backgroundColor: item.type == 0 ?'#fde2e2': '#fefff0'
                 }
             }
             return{
@@ -64,7 +65,6 @@ import { useEventTableStore } from '@/store/pinia'
         height: 144vh;
         position: relative;
     }
-
     .text{
         text-align: center;
         width: 100%;

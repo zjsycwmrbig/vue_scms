@@ -1,5 +1,5 @@
 <template>
-  <div class="userbox" v-if="loginStore.loginstate"><!--登录不成功-->
+  <div class="userbox" v-if="!loginStore.loginstate"><!--登录不成功-->
       <UserBox/>
   </div>
   <div v-else><!--登录成功-->

@@ -18,6 +18,15 @@
                     <span>{{ store.showEvent.title }}</span>
                 </div>
             </template>
+            <div class="body">
+                <el-statistic :value="(Date)(store.showEvent.begin)">
+                    <template #title>
+                      <div style="display: inline-flex; align-items: center">
+                        开始时间
+                      </div>
+                    </template>
+                </el-statistic>
+            </div>
         </el-card>
         </div>
     </div>
