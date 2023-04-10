@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="nowevent">
         <div class="now">
             <el-progress v-if="store.nowEvent.item != null" :percentage="store.nowEvent.progress" :show-text="false" :stroke-linecap="butt"/>
             <el-card class="box-card" v-show="store.eventShow">
@@ -44,4 +44,8 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+.nowevent{
+    width: 100%;
+}
+</style>

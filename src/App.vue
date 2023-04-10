@@ -7,12 +7,11 @@
   <div v-else><!--登录成功-->
     <UserHeader/>
 
-    <el-row >
-      <el-col :span="5">
-        <TimeShow/>
-        <NowEvent/>
-      </el-col>
-      <el-col :span="17">
+    <el-row justify="space-around">
+      <!-- 侧边栏 -->
+      <AsidePart></AsidePart>
+      <!-- 主展示区 -->
+      <el-col :span="15">
         <EventTable/>
       </el-col>
     </el-row>
@@ -35,10 +34,11 @@ import HitoPart from './components/HitoPart.vue'
 import UserBox from './components/UserBox.vue'
 import UserHeader from './components/UserHeader.vue'
 import EventTable from './components/EventTable.vue'
-import TimeShow from './components/TimeShow.vue'
+// import TimeShow from './components/TimeShow.vue'
 import MapPart from './components/MapPart.vue'
 import AddItem from './components/AddItem.vue'
-import NowEvent from './components/NowEvent.vue'
+// import NowEvent from './components/NowEvent.vue'
+import AsidePart from './components/AsidePart.vue'
 
 import { useLoginStore, useMapStore, useTimeStore } from '@/store/pinia';
 
@@ -50,11 +50,10 @@ export default {
     EventTable,
     UserBox,
     TipsBox,
-    TimeShow,
     MapPart,
     HitoPart,
     AddItem,
-    NowEvent,
+    AsidePart
 },
   setup(){
     const mapstore = useMapStore();
@@ -98,7 +97,7 @@ export default {
   transform: translateX(-50%);
 }
 
-.container .aside{
+/* .container .aside{
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -109,6 +108,6 @@ export default {
 .container .main{
   border: 1px solid #ccc;
   width: 65%;
-}
+} */
 
 </style>

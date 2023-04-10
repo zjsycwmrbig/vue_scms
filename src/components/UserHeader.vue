@@ -1,8 +1,8 @@
 <template>
     <div class="Head">
-        <el-row>
+        <el-row align="middle">
             <el-col :span="20">
-                {{ msg }}
+                <el-text>{{ msg }}</el-text>
             </el-col>
             <el-col :span="3">
                 <AvatarPart/>
