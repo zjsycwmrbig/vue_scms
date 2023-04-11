@@ -26,7 +26,7 @@ import { useEventTableStore } from '@/store/pinia'
             let SetItem = (item)=>{
                 return {
                     height:(item.length*100 / parseFloat(86400000)).toFixed(2) + '%' ,
-                    top:(item.begin % 86400000) * 100 / parseFloat(86400000).toFixed(2)+'%',
+                    top:(((item.begin % 86400000) * 100 )/ parseFloat(86400000)).toFixed(2)+'%',
                     backgroundColor: item.type == 0 ?'#fde2e2': '#fefff0'
                 }
             }

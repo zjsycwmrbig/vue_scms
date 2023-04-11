@@ -14,20 +14,45 @@
         </div>
         <div class="show">
             <!-- 鼠标悬浮 -->
-            <el-card class="box-card" v-show="!store.eventShow">
+            <el-card class="box-card" v-if="!store.eventShow">
             <template #header>
                 <div class="card-header">
                     <span>{{ store.showEvent.title }}</span>
                 </div>
             </template>
             <div class="body">
-                <el-statistic :value="(Date)(store.showEvent.begin)">
-                    <template #title>
-                      <div style="display: inline-flex; align-items: center">
-                        开始时间
-                      </div>
-                    </template>
-                </el-statistic>
+                <el-row gutter="20">
+                        <el-col :span="8">
+                        <el-card class="box-card">
+                            <template #header>
+                                <div class="card-header">
+                                    <span>开始时间</span>
+                                </div>
+                            </template>
+                            <el-text>{{(new Date(store.showEvent.begin)).toLocaleString()}}</el-text>
+                        </el-card>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-card class="box-card" >
+                            <template #header>
+                                <div class="card-header">
+                                    <span>地点</span>
+                                </div>
+                            </template>
+                            <el-text>{{map.points[store.showEvent.location-1].name}}</el-text>
+                        </el-card>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-card class="box-card">
+                            <template #header>
+                                <div class="card-header">
+                                    <span>持续时间</span>
+                                </div>
+                            </template>
+                            <el-text>{{ store.showEvent.length/(1000*60*60) + '时' + ((store.showEvent.length)%(1000*60*60))/(1000*60) + '分' }}</el-text>
+                        </el-card>
+                        </el-col>
+                </el-row>
             </div>
         </el-card>
         </div>
@@ -35,20 +60,22 @@
 </template>
 
 <script>
-import { useEventTableStore, useLoginStore, useTimeStore } from '@/store/pinia'
+import { useEventTableStore, useLoginStore, useTimeStore,useMapStore } from '@/store/pinia'
 export default {
     name: 'NowEvnet',
     setup() {
         let store = useEventTableStore()
         let state = useLoginStore()
         let time = useTimeStore()
+        let map = useMapStore()
         setInterval(()=>{
             if(state.loginstate == 1){
             time.LocateItem()//更新store中的数据
         }
         },17)
         return {
-            store
+            store,
+            map
         }
     }
 }
@@ -57,5 +84,8 @@ export default {
 <style>
 .nowevent{
     width: 100%;
+}
+.box-card{
+    height: 100%;
 }
 </style>
