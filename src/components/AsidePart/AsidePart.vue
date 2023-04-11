@@ -6,16 +6,19 @@
             size="large"
             class="aside"
         >
+            <EventsSummary/>
             <NowEvent/>  
         </el-space> 
     </el-col>
 </template>
 
 <script>
+import EventsSummary from './EventsSummary.vue';
 import NowEvent from './NowEvent.vue';
 export default {
     components:{
-        NowEvent
+        NowEvent,
+        EventsSummary
     },
     setup(){
         
