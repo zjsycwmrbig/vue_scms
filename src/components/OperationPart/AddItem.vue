@@ -30,7 +30,14 @@
     </el-form-item>
     <!-- 如果是周期性事件,增加一个结束 -->
     <el-form-item label="事项时间">
-      <el-col :span="11">
+      <el-date-picker
+        v-model="form.date1"
+        type="datetime"
+        placeholder="Select date and time"
+        :default-time="defaultTime"
+      />
+      
+      <!-- <el-col :span="11">
         <el-date-picker
           v-model="form.date1"
           type="date"
@@ -47,7 +54,7 @@
           placeholder="选择时间"
           style="width: 100%"
         />
-      </el-col>
+      </el-col> -->
     </el-form-item>
     
     <el-form-item label="持续时间">

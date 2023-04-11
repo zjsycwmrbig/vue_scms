@@ -22,11 +22,13 @@ import { useEventTableStore } from '@/store/pinia'
         props:['weekday','weekdata'],
         setup(){
             let store = useEventTableStore()
-
+            
             let SetItem = (item)=>{
+                let now = new Date(item.begin)
+                let date = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
                 return {
                     height:(item.length*100 / parseFloat(86400000)).toFixed(2) + '%' ,
-                    top:(((item.begin % 86400000) * 100 )/ parseFloat(86400000)).toFixed(2)+'%',
+                    top:(((item.begin - date) * 100 )/ parseFloat(86400000)).toFixed(2)+'%',
                     backgroundColor: item.type == 0 ?'#fde2e2': '#fefff0'
                 }
             }
@@ -44,9 +46,10 @@ import { useEventTableStore } from '@/store/pinia'
         left: 50%;
         transform:translatex(-50%);
         padding: 6px;
-        border-radius: 4px;
+        border-radius: 10%;
         border: 1px solid #e4e7ed;
         background-color: #fff;
+        width: 60%;
     }
     .eventcard:hover{
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)

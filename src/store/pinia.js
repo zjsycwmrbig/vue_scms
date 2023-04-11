@@ -150,7 +150,7 @@ const useTimeStore = defineStore('time',{
             }
             // 标记现在没有点位在路线上
             if(existFlag && i != event.weekData[weekIndex].list.length ){
-                progress = (((nowTime - event.weekData[weekIndex].list[i].begin)*100 / parseFloat(event.weekData[weekIndex].list[i].length))).toFixed(1)
+                progress = (((nowTime - event.weekData[weekIndex].list[i].begin)*100) / (event.weekData[weekIndex].list[i].length)).toFixed(1)
                 event.nowEvent.item = event.weekData[weekIndex].list[i]
                 event.nowEvent.progress = progress
             }else{
@@ -190,18 +190,17 @@ const useEventTableStore = defineStore('eventtable',{
             })
         },
         // 添加事项数据
-         AddItem(form){
+        AddItem(form){
             let event = useEventTableStore()
             let map = useMapStore()
-            let datebegin = new Date(form.date1.getFullYear(),form.date1.getMonth(),form.date1.getDate(), form.date2.getHours(),form.date2.getMinutes(),form.date2.getSeconds()).getTime()
-            
+            let datebegin = form.date1.getTime()
             axios.post('/api/add/item',{
                 type:form.type,
                 title:form.name,
                 location:map.mapForm.location,
                 circle:form.circle,
                 begin:datebegin,
-                end:form.end==''? datebegin +form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000:form.end.getTime(),
+                end:form.end==''? (datebegin +form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000):(form.end.getTime()),
                 length:form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000
             }).then(function(respose){
                 if(respose.data.res == true){
