@@ -23,7 +23,7 @@
           bg
           @click="mapStore.show=true"
           >
-            {{ mapStore.mapForm.selected == false ?"选择地点":mapStore.points[mapStore.mapForm.location-1].name }}
+            {{ mapStore.mapForm.selected == false ?"选择地点":(mapStore.points[mapStore.mapForm.location-1].name) }}
           </el-button>
       </el-col>
       
@@ -106,6 +106,7 @@ import { useMapStore,useOperationStore,useLoginStore,useEventTableStore } from '
               minuteLength:0,
               circle:0,
               type: '',
+              location:mapStore.mapForm.location
           })
 
           // 捷径

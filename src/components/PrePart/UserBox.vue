@@ -155,8 +155,8 @@
 <style>
   .main{
     position: absolute;
-    right: 40px;
-    bottom: 90px;
+    right: 5vw;
+    bottom: 25vh;
     opacity: 0.92;
   }
   .login-text {

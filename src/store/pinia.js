@@ -184,20 +184,24 @@ const useEventTableStore = defineStore('eventtable',{
                 }
             }).then(function(respose){
                 let event = useEventTableStore()
-                event.eventData = respose.data.events;
+                event.eventData = respose.data.events; //分页
                 event.weekData = respose.data.routines;//数组,包含index和数据
                 event.show = true;
             })
         },
+        // 添加事项数据
          AddItem(form){
             let event = useEventTableStore()
-             axios.post('/api/add/item',{
+            let map = useMapStore()
+            let datebegin = new Date(form.date1.getFullYear(),form.date1.getMonth(),form.date1.getDate(), form.date2.getHours(),form.date2.getMinutes(),form.date2.getSeconds()).getTime()
+            
+            axios.post('/api/add/item',{
                 type:form.type,
                 title:form.name,
-                location:form.location,
+                location:map.mapForm.location,
                 circle:form.circle,
-                begin:form.date2.getTime(),
-                end:form.end==''?form.date2.getTime()+form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000:form.end.getTime(),
+                begin:datebegin,
+                end:form.end==''? datebegin +form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000:form.end.getTime(),
                 length:form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000
             }).then(function(respose){
                 if(respose.data.res == true){
@@ -211,7 +215,7 @@ const useEventTableStore = defineStore('eventtable',{
                 }else{
                     ElNotification({
                         title:"添加数据失败",
-                        message:"请求数据出错",
+                        message:"出现数据冲突",
                         type:"error",
                         position:"bottom-right"
                     })
