@@ -22,14 +22,15 @@ import { useEventTableStore } from '@/store/pinia'
         props:['weekday','weekdata'],
         setup(){
             let store = useEventTableStore()
-            
+            //颜色的数组,可以根据type显示不同颜色
+            let color = ['#fde2e2','#fefff0']
             let SetItem = (item)=>{
                 let now = new Date(item.begin)
                 let date = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
                 return {
                     height:(item.length*100 / parseFloat(86400000)).toFixed(2) + '%' ,
                     top:(((item.begin - date) * 100 )/ parseFloat(86400000)).toFixed(2)+'%',
-                    backgroundColor: item.type == 0 ?'#fde2e2': '#fefff0'
+                    backgroundColor: color[item.type]
                 }
             }
             return{

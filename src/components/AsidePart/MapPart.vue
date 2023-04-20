@@ -5,7 +5,8 @@
         :show-close="false"
         class="mapdrawer"
         :size="'45%'"
-    >
+    >  
+    <!-- 需要更新导航可视化模块 -->
     <div class="map">
         <div v-for="item in store.points" :key="item.pid">
             <el-popover
@@ -32,8 +33,8 @@ import { useMapStore } from '@/store/pinia';
             store.GetPoints() //得到后端数据
 //          四十是vw的比例
             function LocatePoint(item){
-                let top = (((item.y/store.mapy) * (40 * store.mapy / store.mapx)).toFixed(4)-0.3).toString()+'vw'
-                let left = (((item.x/store.mapx) * 40).toFixed(4)-0.3).toString()+'vw'
+                let top = ((item.y * 47 / 100) + 0.25).toString()+'vw'
+                let left = ((item.x * 40 / 100) - 0.25).toString()+'vw'
                 return {
                     top,
                     left
@@ -42,8 +43,8 @@ import { useMapStore } from '@/store/pinia';
 
             function PointStyle(item){
                 return{
-                    realpoint: !item.ptype,
-                    fakepoint: item.ptype
+                    realpoint: !item.type,
+                    fakepoint: item.type
                 }
             }
 
@@ -58,6 +59,8 @@ import { useMapStore } from '@/store/pinia';
 
 <style scoped>
 .map{
+    /* 为了速度写死了呀 */
+    /* 宽度是40,高度是 */
     position: relative;
     width: 40vw;
 }
@@ -67,11 +70,12 @@ import { useMapStore } from '@/store/pinia';
 }
 
 .realpoint{
+    /* 点的大小也写死了 */
     position: absolute;
     display: block;
     border-radius: 50%;
-    height: 0.6vw;
-    width: 0.6vw;
+    height: 0.5vw;
+    width: 0.5vw;
     background-color: #000;
 }
 .fakepoint{
