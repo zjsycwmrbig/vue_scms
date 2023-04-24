@@ -35,9 +35,9 @@
     </el-row>
     
     <!-- 给出搜索结果 -->
-    <el-row>
-        <div class="SearchCard">
-            
+    <el-row v-if="search.searchRes != null && search.searchRes.list != null">
+        <div class="searchcard" v-for="(item,index) in search.searchRes.list" :key="index">
+            {{ item.item.title }}
         </div>
     </el-row>
   </el-drawer>
@@ -68,5 +68,11 @@ import { reactive } from 'vue'
 </script>
 
 <style>
-
+    .searchcard{
+        width: 100%;
+        height: 10vh;
+        background-color: #fff5eb;
+        border: 1px solid #fde3c7;
+        margin-bottom: 5px;
+    }
 </style>
