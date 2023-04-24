@@ -20,7 +20,7 @@
             </template>
         </el-popover>
         </div>
-        <img src="/api/map.png" alt="">
+        <img src="/api/static/map.png" alt="">
     </div>
   </el-drawer>
 </template>

@@ -90,7 +90,7 @@ export default {
         function ChangeDate(det) {
             let next = (store.GlobalTime.getDay()+6)%7+det
             if(next < 0 || next > 6){
-                // 跳跃式更新到下一周
+                // 跳跃式更新到下一周,更新数据,但是好像倒着跳没有更新
                 event.GetWeekData()
             }
             store.GlobalTime = new Date(store.GlobalTime.getTime() + DAY * det)

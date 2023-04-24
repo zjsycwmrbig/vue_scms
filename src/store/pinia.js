@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import { ElNotification } from "element-plus";
-
+//登录store
 const useLoginStore = defineStore('Login',{
     
     // 完整类型推断函数
@@ -105,7 +105,7 @@ const useLoginStore = defineStore('Login',{
 
     }
 })
-
+//时间
 const useTimeStore = defineStore('time',{
     state:()=>{
         return{
@@ -160,7 +160,7 @@ const useTimeStore = defineStore('time',{
         },
     }
 })
-
+//时间表
 const useEventTableStore = defineStore('eventtable',{
     state:()=>{
         return{
@@ -223,7 +223,7 @@ const useEventTableStore = defineStore('eventtable',{
         }
     }
 })
-
+//地图
 const useMapStore = defineStore('map',{
     state:()=>{
         return{
@@ -242,7 +242,7 @@ const useMapStore = defineStore('map',{
     actions:{
         async GetPoints(){
             let temp;
-            await axios.get("/api/Points.json",{
+            await axios.get("/api/static/Points.json",{
                 params:{
                     t:new Date().getTime()
                 }
@@ -258,7 +258,7 @@ const useMapStore = defineStore('map',{
         }
     }
 })
-
+//每日一句
 const useHitokotoStore = defineStore('hito',{
     state:()=>{
         return{
@@ -279,23 +279,48 @@ const useHitokotoStore = defineStore('hito',{
         }
     }
 })
-
 // 关于抽屉等的开关
 const useOperationStore = defineStore('aside',{
     state:()=>{
         return{
             operationShow:false,
-            addShow:false
+            addShow:false,
+            searchShow:false
         }
     },
 })
+//搜索相关
+const useSearchStore = defineStore('search',{
+    state:()=>{
+        return{
+            searchRes:Object
+        }
+    },
+    actions:{
+        async Search(searchForm){
+            let store = useSearchStore()
+            await axios.get("/api/query/search",{
+                params:{
+                    key:searchForm.key,
+                    searchmode:searchForm.searchmode==''?1:searchForm.searchmode
+                }
+            }).then(function(respose){
+                if(respose.status == 200){
+                    store.searchRes = respose.data
+                    console.log(store.searchRes);
+                }
+            })
+        }
+    }    
 
+})
 export{
     useLoginStore,
     useTimeStore,
     useEventTableStore,
     useMapStore,
     useHitokotoStore,
-    useOperationStore
+    useOperationStore,
+    useSearchStore
 }
 
