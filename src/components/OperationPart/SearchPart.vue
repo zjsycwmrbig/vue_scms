@@ -36,9 +36,7 @@
     
     <!-- 给出搜索结果 -->
     <el-row v-if="search.searchRes != null && search.searchRes.list != null">
-        <div class="searchcard" v-for="(item,index) in search.searchRes.list" :key="index">
-            {{ item.item.title }}
-        </div>
+        <SearchCard v-for="(item,index) in search.searchRes.list" :key="index"  :data="item.item"/>
     </el-row>
   </el-drawer>
 </template>
@@ -46,7 +44,11 @@
 <script>
 import { useOperationStore,useSearchStore } from '@/store/pinia'
 import { reactive } from 'vue'
+import SearchCard from './SearchCard.vue'
     export default {
+        components:{
+            SearchCard
+        },
         setup(){
             let search = useSearchStore()
             let store = useOperationStore()
@@ -68,11 +70,5 @@ import { reactive } from 'vue'
 </script>
 
 <style>
-    .searchcard{
-        width: 100%;
-        height: 10vh;
-        background-color: #fff5eb;
-        border: 1px solid #fde3c7;
-        margin-bottom: 5px;
-    }
+    
 </style>
