@@ -35,7 +35,6 @@ import { useMapStore } from '@/store/pinia'
         props:['data'],
         setup(){
             let store = useMapStore()
-
             return{
                 store
             }

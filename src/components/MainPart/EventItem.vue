@@ -7,7 +7,7 @@
         <!-- 这是显示每个信息的地方 -->
         <div class="eventbox">
             <div class="eventcard" v-for="(item,itemIndex) in weekdata" :key="itemIndex" :style="SetItem(item)" @mouseenter="store.eventShow = false;store.showEvent = item" @mouseleave="store.eventShow = true">
-                <el-text truncated="true" >
+                <el-text truncated="true" class="title">
                     {{ item.title }}
                 </el-text>
             </div>
@@ -51,6 +51,7 @@ import { useEventTableStore } from '@/store/pinia'
         border: 1px solid #e4e7ed;
         background-color: #fff;
         width: 60%;
+        display: flex;
     }
     .eventcard:hover{
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
@@ -72,5 +73,8 @@ import { useEventTableStore } from '@/store/pinia'
     .text{
         text-align: center;
         width: 100%;
+    }
+    .title{
+        margin:auto 0;
     }
 </style>

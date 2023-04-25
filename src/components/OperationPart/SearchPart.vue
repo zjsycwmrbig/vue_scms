@@ -12,7 +12,6 @@
             placeholder="请输入搜索关键词"
             class="input-with-select"
         >
-      
         <template #prepend>
         <el-select v-model="searchForm.searchmode" placeholder="搜索模式" style="width: 5vw">
           <el-option label="普通搜索" value="1" />
