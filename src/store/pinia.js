@@ -314,6 +314,31 @@ const useSearchStore = defineStore('search',{
     }    
 
 })
+// 个人资料
+// const useCenterStore = defineStore('center',{
+//     state:()=>{
+//         return{
+//             userData:Object
+//         }
+//     },
+//         actions:{
+//             async Submit(netname,signature,sex,age){
+//                 if(netname==""||signature==""||sex==""||age==""){
+//                     ElNotification({
+//                         title:"设置失败",
+//                         message:"请输入完整信息",
+//                         type:"error",
+//                         position:"bottom-right"
+//                     })
+//                 }
+//                 else{
+//                     // 传网名 个性签名 性别 年龄过去
+//                     //不需要返回数据
+//                 }
+//             }
+//         }
+//     }
+// })
 export{
     useLoginStore,
     useTimeStore,
