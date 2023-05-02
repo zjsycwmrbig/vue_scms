@@ -36,25 +36,6 @@
         placeholder="Select date and time"
         :default-time="defaultTime"
       />
-      
-      <!-- <el-col :span="11">
-        <el-date-picker
-          v-model="form.date1"
-          type="date"
-          placeholder="选择日期"
-          style="width: 100%"
-        />
-      </el-col>
-      <el-col :span="2" class="text-center">
-        <span class="text-gray-500">-</span>
-      </el-col>
-      <el-col :span="11">
-        <el-time-picker
-          v-model="form.date2"
-          placeholder="选择时间"
-          style="width: 100%"
-        />
-      </el-col> -->
     </el-form-item>
     
     <el-form-item label="持续时间">

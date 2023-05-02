@@ -12,16 +12,18 @@
         <!-- 右侧部分 -->
         <el-col :span="18">
             <el-space alignment="vertical" fill="true" class="sidebox">
+                
                 <div class="side time">
                     {{ (new Date(data.begin)).toLocaleDateString() }}
                 </div>
                 <div class="side loc">
-                    {{ store.points[data.location].name }}
+                    {{ data.location != -1?store.points[data.location].name:'地点未知' }}
                 </div>
             
                 <div class="side org">
                     {{ data.type == 0 ? "网名" : "组织名称" }}
                 </div>
+
             </el-space>
         </el-col>
   </el-row>

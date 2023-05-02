@@ -1,5 +1,5 @@
 <template>
-  <el-row justify="space-around">
+  <el-row justify="space-around" class="table">
     <el-col v-for="index in 7" :key="index" :span="3">
         <EventItem :weekday="WeekDay[index-1]" :weekdata="store.weekData[index-1]==null?null:store.weekData[index-1].list"/>
     </el-col>
@@ -27,9 +27,7 @@ import EventItem from './EventItem.vue';
 </script>
 
 <style scoped> 
-    .routable{
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
+    .table{
+        z-index: 0;
     }
 </style>

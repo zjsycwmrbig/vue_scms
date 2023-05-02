@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div >
     <div class="text">
         {{weekday}}
     </div>
@@ -46,12 +46,13 @@ import { useEventTableStore } from '@/store/pinia'
         position: absolute;
         left: 50%;
         transform:translatex(-50%);
-        padding: 6px;
+        padding: 2px;
         border-radius: 10%;
+        margin-top: 2px;
         border: 1px solid #e4e7ed;
-        background-color: #fff;
         width: 60%;
         display: flex;
+        z-index: 0;
     }
     .eventcard:hover{
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)

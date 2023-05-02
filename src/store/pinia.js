@@ -40,9 +40,8 @@ const useLoginStore = defineStore('Login',{
                     {
                         // 请求成功
                         if(respose.data.state == "登录成功"){
-                            store.GetWeekData()  //登录成功获取一次数据
+                            store.GetWeekData()
                             login.userData = respose.data;
-                            console.log(login.userData);
                             ElNotification({
                                 title:"登录成功",
                                 message:"尊敬的"+respose.data.netname+",您好",
@@ -101,8 +100,15 @@ const useLoginStore = defineStore('Login',{
                     }
                 })
             }
+        },
+        Logout(){
+            let store = useLoginStore()
+            axios.get('api/user/logout').then(function(respose){
+                if(respose.data.res == true){
+                    store.loginstate = 0;
+                }
+            })
         }
-
     }
 })
 //时间
@@ -285,7 +291,9 @@ const useOperationStore = defineStore('aside',{
         return{
             operationShow:false,
             addShow:false,
-            searchShow:false
+            searchShow:false,
+            userCardShow :false,
+            userCenterShow:false
         }
     },
 })
@@ -314,6 +322,31 @@ const useSearchStore = defineStore('search',{
     }    
 
 })
+
+//css样式相关
+const useCssStore = defineStore('css',{
+    state:()=>{
+        return{
+            OBGC:['#66CCCC','#FF9999','#99CC33','#66CCCC','#CC9999'],//背景颜色组
+            OBDC:['#CCFF66','#FFCC99','#CCFF00','#666699','#666699'],//
+            PBGC:[''],
+            PBDC:[]
+        }
+    },
+    actions:{
+        //根据ID的值返回应有的owner样式,是偏彩色,ID是用来随机的
+        GetOwnerCss(typeID){
+            return typeID
+        },
+        //返回player样式,是偏黑深色
+        GetPlayerCss(typeID){
+            return typeID
+        }
+    }
+})
+
+
+
 // 个人资料
 // const useCenterStore = defineStore('center',{
 //     state:()=>{
@@ -346,6 +379,7 @@ export{
     useMapStore,
     useHitokotoStore,
     useOperationStore,
-    useSearchStore
+    useSearchStore,
+    useCssStore
 }
 

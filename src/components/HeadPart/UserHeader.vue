@@ -1,6 +1,6 @@
 <template>
     <div class="head">
-        <el-row align="middle" gutter="20"> 
+        <el-row align="middle" gutter="20" class="headrow"> 
             <!-- 按钮组 -->
             <el-col :span="4">
                 <el-button-group>
@@ -55,8 +55,13 @@ import { useOperationStore } from '@/store/pinia'
 </script>
 
 <style scoped>
+    /* 限制顶端大小 */
     .head{
         border-bottom: 2px #ccc solid;
         margin-bottom: 1vh;
+        height: 5vh;
+    }
+    .headrow{
+        height: 5vh;
     }
 </style>
