@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
-import { ElNotification } from "element-plus";
+import { ElMessage, ElNotification } from "element-plus";
 //登录store
 const useLoginStore = defineStore('Login',{
     
@@ -8,7 +8,8 @@ const useLoginStore = defineStore('Login',{
     state:()=>{
         return{
             loginstate:0,
-            userData:Object
+            userData:Object,
+            orgData:Object
             // 提示词
         }
     },
@@ -18,6 +19,7 @@ const useLoginStore = defineStore('Login',{
         setUser(loginstate){
             this.loginstate = loginstate;
         },
+
         async Login(user,pass){
             if(user==""||pass==""){
                 // 用户名
@@ -72,6 +74,7 @@ const useLoginStore = defineStore('Login',{
                 })
             }
         },
+
         async Register(user,pass,name,word){
             if(user==""||pass==""){
                 // 用户名
@@ -101,11 +104,74 @@ const useLoginStore = defineStore('Login',{
                 })
             }
         },
+
         Logout(){
             let store = useLoginStore()
             axios.get('api/user/logout').then(function(respose){
                 if(respose.data.res == true){
                     store.loginstate = 0;
+                }
+            })
+        },
+        //修改条目
+        async ChangeItem(name,itemname){    
+            await axios.get('api/user/change_'+itemname,{
+                params:{
+                    netname:name
+                }
+            }).then(function(respose){
+                if(respose.status == 200){
+                    if(respose.data.res == true){
+                        ElMessage.success("修改成功");
+                    }else{
+                        ElMessage.error("修改失败");
+                    }
+                }else{
+                    console.log("error");
+                    ElMessage.success("请求失败");
+                }
+            })
+        },
+        //创建,修改组织
+
+        async ChangeOrg(name,orgitem){
+            
+            // create和jion
+            await axios.get('api/org/'+orgitem,{
+                params:{
+                    org:name
+                }
+            }).then(function(respose){
+                let user = useLoginStore()    
+                if(respose.status == 200){
+                    if(respose.data.res == true){
+                        if(orgitem == 'create'){
+                            user.userData.owner.push(name)
+                        }else if(orgitem == 'join'){
+                            user.userData.player.push(name)
+                        }
+                        ElNotification({
+                            title:"操作成功",
+                            message:respose.data.state,
+                            type:"success",
+                            position:"bottom-right"
+                        })
+
+                    }else{
+                        ElNotification({
+                            title:"操作失败",
+                            message:respose.data.state,
+                            type:"error",
+                            position:"bottom-right"
+                        })
+                    }
+                }else{
+                    ElNotification({
+                        title:"请求失败",
+                        message:"服务器错误",
+                        type:"error",
+                        position:"bottom-right"
+                    })
                 }
             })
         }
