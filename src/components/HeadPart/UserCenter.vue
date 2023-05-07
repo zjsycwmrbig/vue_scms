@@ -115,6 +115,7 @@
                         <span> {{ user.userData.owner[org.showOrg] }} </span>
                       </div>
                 </template>
+
                 <el-space
                       size="large"
                       wrap="true"
@@ -129,26 +130,16 @@
                   >
                     {{ user }}
                   </el-tag>
+                
                 </el-space>
 
                 <el-divider>邀请新成员</el-divider>
-                <el-row>
-                  <el-col :span="4">
-                    <el-select v-model="value" placeholder="选择加入" size="large">
-                      <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      />
-                    </el-select>
-                  </el-col>
 
-                </el-row>
+                
+
 
 
               </el-card>
-
               <el-card class="card"> 
                     <template #header>
                       <div class="card-header">
@@ -219,6 +210,11 @@ export default {
           createOrg:'',
           joinOrg:'',
         })
+
+        let userSearch = reactive({
+          form:'',
+          to:''
+        })//从 .. 到 ..
         
         const submitName = function(name){
             form.editname = false
@@ -255,11 +251,13 @@ export default {
         const RemoveOrg = function(){
 
         }
+
         return{
             option,
             form,
             user,
             org,
+            userSearch,
             beforeAvatarUpload,
             submitName,
             submitWord,

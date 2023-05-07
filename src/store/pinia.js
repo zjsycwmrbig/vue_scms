@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import { ElMessage, ElNotification } from "element-plus";
+
 //登录store
 const useLoginStore = defineStore('Login',{
     
@@ -150,13 +151,13 @@ const useLoginStore = defineStore('Login',{
                         }else if(orgitem == 'join'){
                             user.userData.player.push(name)
                         }
+                        
                         ElNotification({
                             title:"操作成功",
                             message:respose.data.state,
                             type:"success",
                             position:"bottom-right"
                         })
-
                     }else{
                         ElNotification({
                             title:"操作失败",
@@ -177,6 +178,7 @@ const useLoginStore = defineStore('Login',{
         }
     }
 })
+
 //时间
 const useTimeStore = defineStore('time',{
     state:()=>{
@@ -201,38 +203,66 @@ const useTimeStore = defineStore('time',{
             }, 17)
         },
         // 定位目前Item顺序,按照一定比例定位
+        //要不要根据一个二分算法实现这个定位
         LocateItem(){
             let event = useEventTableStore()
-
-            let weekIndex = (this.GlobalTime.getDay() + 6) % 7
-            
-            let progress = 0 //进度
             let nowTime = this.GlobalTime.getTime()
-            // 判定是否有
-            if(event.weekData[weekIndex].list == null){
-                return;
-            }
+            //二分准备
+            let rightIndex = event.dataList.length
+            let leftIndex = 0
+            let midIndex = Math.floor((leftIndex + rightIndex)/2)
 
-            let i = 0;
-            let existFlag = false;
-            // 遍历找到可能是下一个或者这一个
-            for(;i < event.weekData[weekIndex].list.length;i++){
-                existFlag = true;
-                if( nowTime <= event.weekData[weekIndex].list[i].begin + event.weekData[weekIndex].list[i].length) break;
+            //二分查询到一个--- |某个事件之后的事件 ---
+            while(midIndex != leftIndex && rightIndex > leftIndex){
+                midIndex = Math.floor((leftIndex + rightIndex)/2)
+                let det = event.weekData[event.dataList[midIndex].weekIndex].list[event.dataList[midIndex].index].begin - nowTime
+                if(det < 0){
+                    rightIndex = midIndex - 1
+                }else{
+                    leftIndex = midIndex
+                }
             }
-            // 标记现在没有点位在路线上
-            if(existFlag && i != event.weekData[weekIndex].list.length ){
-                progress = (((nowTime - event.weekData[weekIndex].list[i].begin)*100) / (event.weekData[weekIndex].list[i].length)).toFixed(1)
-                event.nowEvent.item = event.weekData[weekIndex].list[i]
-                event.nowEvent.progress = progress
+            midIndex = leftIndex
+            let item
+            let progress
+            event.summary.done = midIndex + 1 //对这个时间有几种可能
+            if(event.dataList.length!=0){
+                //正在进行和还没进行(一般是0的情况)的情况
+                item = event.weekData[event.dataList[midIndex].weekIndex].list[event.dataList[midIndex].index]
+                progress = (((nowTime - item.begin)*100) / (item.length)).toFixed(1)
+
+                //如果大于100的话,完成数加1
+                if(progress > 100){//大于100%
+                    event.summary.done = event.summary.done + 1
+                    //显示距离下一项事件时间
+                    if(midIndex + 1 < event.dataList.length){
+                        item = event.weekData[event.dataList[midIndex+1].weekIndex].list[event.dataList[midIndex+1].index]
+                        progress = (((nowTime - item.begin)*100) / (item.length)).toFixed(1)
+                        if(progress > 100){
+                            event.summary.done = event.summary.done + 1
+                            item = null
+                            progress = 0    
+                        }
+                    }else{
+                        //这个事件是最后一个事件
+                        item = null
+                        progress = 0
+                    }
+                }else{
+                    event.summary.done = event.summary.done - 1
+                }
             }else{
-                event.nowEvent.item = null
-                event.nowEvent.progress = -1
+                item = null
             }
-        },
+            
+
+            event.nowEvent.item = item
+            event.nowEvent.progress = progress
+        }
     }
 })
-//时间表
+
+//事件表
 const useEventTableStore = defineStore('eventtable',{
     state:()=>{
         return{
@@ -244,8 +274,14 @@ const useEventTableStore = defineStore('eventtable',{
                 progress:Number
             },//显示当下事件
             showEvent:Object,//显示hover时的事件
+            dataList:Array, //按照时间找到索引
+            summary:{
+                total:Number,
+                done:Number,
+            }//总结数据
         }
     },
+
     actions:{
         // 批量请求数据
         GetWeekData(){
@@ -258,6 +294,7 @@ const useEventTableStore = defineStore('eventtable',{
                 let event = useEventTableStore()
                 event.eventData = respose.data.events; //分页
                 event.weekData = respose.data.routines;//数组,包含index和数据
+                event.BuildDataList(respose.data.routines) //构建
                 event.show = true;
             })
         },
@@ -292,9 +329,26 @@ const useEventTableStore = defineStore('eventtable',{
                     })
                 }
             })
+        },
+        BuildDataList(routines){
+            let event = useEventTableStore()
+            event.dataList = new Array()
+            for(var weekIndex = 0;weekIndex < routines.length ; weekIndex = weekIndex + 1) {   
+                for(var index = 0;index < routines[weekIndex].list.length;index = index + 1){
+
+                    
+                    event.dataList.push({
+                        weekIndex:weekIndex,
+                        index:index
+                    })//这里直接push进去一个对象就不行!!!
+                    console.log(event.dataList);
+                }
+            }
+            event.summary.total = event.dataList.length //更新summary的数据
         }
     }
 })
+
 //地图
 const useMapStore = defineStore('map',{
     state:()=>{
@@ -330,6 +384,7 @@ const useMapStore = defineStore('map',{
         }
     }
 })
+
 //每日一句
 const useHitokotoStore = defineStore('hito',{
     state:()=>{
@@ -351,6 +406,7 @@ const useHitokotoStore = defineStore('hito',{
         }
     }
 })
+
 // 关于抽屉等的开关
 const useOperationStore = defineStore('aside',{
     state:()=>{
@@ -363,6 +419,7 @@ const useOperationStore = defineStore('aside',{
         }
     },
 })
+
 //搜索相关
 const useSearchStore = defineStore('search',{
     state:()=>{
@@ -412,32 +469,6 @@ const useCssStore = defineStore('css',{
 })
 
 
-
-// 个人资料
-// const useCenterStore = defineStore('center',{
-//     state:()=>{
-//         return{
-//             userData:Object
-//         }
-//     },
-//         actions:{
-//             async Submit(netname,signature,sex,age){
-//                 if(netname==""||signature==""||sex==""||age==""){
-//                     ElNotification({
-//                         title:"设置失败",
-//                         message:"请输入完整信息",
-//                         type:"error",
-//                         position:"bottom-right"
-//                     })
-//                 }
-//                 else{
-//                     // 传网名 个性签名 性别 年龄过去
-//                     //不需要返回数据
-//                 }
-//             }
-//         }
-//     }
-// })
 export{
     useLoginStore,
     useTimeStore,

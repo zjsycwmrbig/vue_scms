@@ -45,6 +45,8 @@
             </div>
         </el-card>
         </div>
+
+        
         <div class="show">
             <!-- 鼠标悬浮 -->
             <el-card class="box-card" v-if="!store.eventShow">
