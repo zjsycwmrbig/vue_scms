@@ -415,7 +415,8 @@ const useOperationStore = defineStore('aside',{
             addShow:false,
             searchShow:false,
             userCardShow :false,
-            userCenterShow:false
+            userCenterShow:false,
+            messageShow:false
         }
     },
 })
