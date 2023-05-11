@@ -15,7 +15,7 @@
                 <el-button size="large" @click="asideStore.searchShow = !asideStore.searchShow">   
                     <el-icon><Search /></el-icon>
                 </el-button>
-                <el-button size="large" @click="changestate">
+                <el-button size="large" @click="asideStore.messageShow = !asideStore.messageShow">
                     <el-icon><Promotion /></el-icon>
                 </el-button>
                 </el-button-group>
@@ -30,6 +30,8 @@
             </el-col>
             <!-- 注册搜索模块 -->
             <SearchPart/>
+            <!-- 注册消息模块 -->
+            <MessageShow/>
         </el-row>
     </div>
 </template>
@@ -39,12 +41,14 @@
 import { ref } from 'vue'
 import AvatarPart from './AvatarPart.vue'
 import SearchPart from '../OperationPart/SearchPart.vue'
+import MessageShow from '../OperationPart/MessageShow.vue'
 import { useOperationStore } from '@/store/pinia'
     export default {
         name:"UserHeader",
         components:{
             AvatarPart,
-            SearchPart
+            SearchPart,
+            MessageShow
         },
         setup(){
             let asideStore = useOperationStore()

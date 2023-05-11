@@ -1,8 +1,8 @@
 <template>
     <el-drawer
-        v-if="store.messageShow"
+        v-model="store.messageShow"
         title="通知列表"
-        :show-close="false"
+        :show-close="true"
         class="form">
         <span>Hi there!</span>
     </el-drawer>
