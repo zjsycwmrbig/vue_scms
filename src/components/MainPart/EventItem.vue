@@ -10,6 +10,7 @@
                 <el-text truncated="true" class="title" style="opacity: 1;">
                     {{ item.title }}
                 </el-text>
+                <el-button size="small" class="delete" :icon="Delete" plain="true" text="true" @click="store.DeleteItem(item)"></el-button>
             </div>
         </div>
     </div>
@@ -17,6 +18,7 @@
 </template>
 
 <script>
+import { Delete } from '@element-plus/icons-vue'
 import { useEventTableStore } from '@/store/pinia'
     export default {
         props:['weekday','weekdata'],
@@ -36,7 +38,8 @@ import { useEventTableStore } from '@/store/pinia'
             }
             return{
                 store,
-                SetItem
+                SetItem,
+                Delete
             }
         }
     }
@@ -78,5 +81,12 @@ import { useEventTableStore } from '@/store/pinia'
     }
     .title{
         margin:auto 0;
+        overflow: hidden;
+    }
+
+    .delete{
+        position: absolute;
+        top: 0;
+        right: 0;
     }
 </style>

@@ -188,6 +188,7 @@ const useTimeStore = defineStore('time',{
         }
     },
     actions:{
+        //开始计时
         BeginTime(){
             let event = useEventTableStore()
             // 开始时间并且定位进度
@@ -202,60 +203,39 @@ const useTimeStore = defineStore('time',{
                 
             }, 17)
         },
-        // 定位目前Item顺序,按照一定比例定位
-        //要不要根据一个二分算法实现这个定位
+        //根据二分算法实现定位
         LocateItem(){
             let event = useEventTableStore()
             let nowTime = this.GlobalTime.getTime()
             //二分准备
-            let rightIndex = event.dataList.length
+            let rightIndex = event.dataList.length//坐标
             let leftIndex = 0
             let midIndex = Math.floor((leftIndex + rightIndex)/2)
 
             //二分查询到一个--- |某个事件之后的事件 ---
-            while(midIndex != leftIndex && rightIndex > leftIndex){
+            while(rightIndex > leftIndex){
                 midIndex = Math.floor((leftIndex + rightIndex)/2)
-                let det = event.weekData[event.dataList[midIndex].weekIndex].list[event.dataList[midIndex].index].begin - nowTime
-                if(det < 0){
-                    rightIndex = midIndex - 1
+                let indexItem = event.weekData[event.dataList[midIndex].weekIndex].list[event.dataList[midIndex].index]
+                let det = indexItem.begin + indexItem.length  - nowTime
+                
+                if(det >= 0){
+                    rightIndex = midIndex
                 }else{
-                    leftIndex = midIndex
+                    leftIndex = midIndex + 1
                 }
             }
-            midIndex = leftIndex
+            
             let item
             let progress
-            event.summary.done = midIndex + 1 //对这个时间有几种可能
+            event.summary.done = midIndex
             if(event.dataList.length!=0){
                 //正在进行和还没进行(一般是0的情况)的情况
                 item = event.weekData[event.dataList[midIndex].weekIndex].list[event.dataList[midIndex].index]
                 progress = (((nowTime - item.begin)*100) / (item.length)).toFixed(1)
-
-                //如果大于100的话,完成数加1
-                if(progress > 100){//大于100%
-                    event.summary.done = event.summary.done + 1
-                    //显示距离下一项事件时间
-                    if(midIndex + 1 < event.dataList.length){
-                        item = event.weekData[event.dataList[midIndex+1].weekIndex].list[event.dataList[midIndex+1].index]
-                        progress = (((nowTime - item.begin)*100) / (item.length)).toFixed(1)
-                        if(progress > 100){
-                            event.summary.done = event.summary.done + 1
-                            item = null
-                            progress = 0    
-                        }
-                    }else{
-                        //这个事件是最后一个事件
-                        item = null
-                        progress = 0
-                    }
-                }else{
-                    event.summary.done = event.summary.done - 1
-                }
             }else{
                 item = null
+                progress = 0
             }
-            
-
             event.nowEvent.item = item
             event.nowEvent.progress = progress
         }
@@ -330,6 +310,31 @@ const useEventTableStore = defineStore('eventtable',{
                 }
             })
         },
+        //删除条目
+        DeleteItem(item){
+            axios.delete('/api/add/item',{
+                type:item.type,
+                begin:item.begin
+            }).then(function(respose){
+                if(respose.data.res == true){
+                    ElNotification({
+                        title:"删除数据成功",
+                        message:"已删除该数据",
+                        type:"success",
+                        position:"bottom-right"
+                    })
+                    event.GetWeekData()//获取新信息
+                }else{
+                    ElNotification({
+                        title:"删除数据失败",
+                        message:"服务器出现错误",
+                        type:"error",
+                        position:"bottom-right"
+                    })
+                }
+            })
+        },
+        //构建线性索引
         BuildDataList(routines){
             let event = useEventTableStore()
             event.dataList = new Array()
