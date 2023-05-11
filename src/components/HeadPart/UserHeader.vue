@@ -15,6 +15,9 @@
                 <el-button size="large" @click="asideStore.searchShow = !asideStore.searchShow">   
                     <el-icon><Search /></el-icon>
                 </el-button>
+                <el-button size="large" @click="changestate">
+                    <el-icon><Promotion /></el-icon>
+                </el-button>
                 </el-button-group>
             </el-col>
             <!-- 中心标题 -->
@@ -46,9 +49,13 @@ import { useOperationStore } from '@/store/pinia'
         setup(){
             let asideStore = useOperationStore()
             let msg = ref("SCMS-在路上")
+            function changestate(){
+                asideStore.messageShow = !asideStore.messageShow;
+            }
             return{
                 msg,
-                asideStore
+                asideStore,
+                changestate
             }
         }
     }
