@@ -10,41 +10,45 @@
                             effect="dark"
                             round
                         >
-                          {{ store.nowEvent.item != null ? store.nowEvent.item.group : ''}}
+                          {{ store.nowEvent.item != null ? store.nowEvent.item.group : '闲'}}
                         </el-tag>
                     </span>
                 </div>
             </template>
-            <div class="body" v-if="store.nowEvent.item != null">
+            <div class="body" >
+                <!-- v-if="store.nowEvent.item != null" -->
                 <el-row gutter="20">
                         <el-col :span="8">
                         <el-card class="box-card">
                             <template #header>
-                                <div class="card-header">
+                                <div class="text_2">
                                     <span>开始时间</span>
                                 </div>
                             </template>
-                            <el-text>{{(new Date(store.nowEvent.item.begin)).toLocaleString()}}</el-text>
+                            <el-text v-if="store.nowEvent.item != null">{{(new Date(store.nowEvent.item.begin)).toLocaleString()}}</el-text>
+                            <el-text v-else class="text_1">放</el-text>
                         </el-card>
                     </el-col>
                     <el-col :span="8">
                         <el-card class="box-card" >
                             <template #header>
-                                <div class="card-header">
-                                    <span>地点</span>
+                                <div class="text_2">
+                                    <span>事项地点</span>
                                 </div>
                             </template>
-                            <el-text>{{map.points[store.nowEvent.item.location-1]!=null?map.points[store.nowEvent.item.location-1].name:"无地点"}}</el-text>
+                            <el-text v-if="store.nowEvent.item != null">{{map.points[store.nowEvent.item.location-1]!=null?map.points[store.nowEvent.item.location-1].name:"无地点"}}</el-text>
+                            <el-text v-else class="text_1">假</el-text>
                         </el-card>
                     </el-col>
                     <el-col :span="8">
                         <el-card class="box-card">
                             <template #header>
-                                <div class="card-header">
+                                <div class="text_2">
                                     <span>持续时间</span>
                                 </div>
                             </template>
-                            <el-text>{{ store.nowEvent.item.length/(1000*60*60) + '时' + ((store.nowEvent.item.length)%(1000*60*60))/(1000*60) + '分' }}</el-text>
+                            <el-text v-if="store.nowEvent.item != null">{{ store.nowEvent.item.length/(1000*60*60) + '时' + ((store.nowEvent.item.length)%(1000*60*60))/(1000*60) + '分' }}</el-text>
+                            <el-text v-else class="text_1">了</el-text>
                         </el-card>
                         </el-col>
                 </el-row>
@@ -75,7 +79,7 @@
                         <el-col :span="8">
                         <el-card class="box-card">
                             <template #header>
-                                <div class="card-header">
+                                <div class="text_2">
                                     <span>开始时间</span>
                                 </div>
                             </template>
@@ -85,8 +89,8 @@
                     <el-col :span="8">
                         <el-card class="box-card" >
                             <template #header>
-                                <div class="card-header">
-                                    <span>地点</span>
+                                <div class="text_2">
+                                    <span>事项地点</span>
                                 </div>
                             </template>
                             <el-text>{{map.points[store.showEvent.location-1] != null?map.points[store.showEvent.location-1].name:无地点}}</el-text>
@@ -95,7 +99,7 @@
                     <el-col :span="8">
                         <el-card class="box-card">
                             <template #header>
-                                <div class="card-header">
+                                <div class="text_2">
                                     <span>持续时间</span>
                                 </div>
                             </template>
@@ -136,6 +140,22 @@ export default {
 .eventshow{
     width: 100%;
     height: 30vh;
+}
+.text_1{
+    display: block;
+    font-size: 5rem;
+    width: 100%;
+    margin: 0 auto;
+    font-weight: 900;
+    text-align: center;
+    color: #20a0ff;
+}
+.text_2{
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    font-weight: 700;
+    color: #20a0ff;
 }
 .head{
     display: flex;

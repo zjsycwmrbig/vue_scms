@@ -2,8 +2,6 @@
   
   <el-row  justify="space-around" class="table">
     <!-- 切换按钮 -->
-    
-
     <el-col v-for="index in 7" :key="index" :span="3">
         <EventItem :weekindex="index" :weekday="WeekDay[index-1]" :weekdata="store.weekData[index-1]==null?null:store.weekData[index-1].list"/>
     </el-col>
@@ -43,5 +41,8 @@ import EventItem from './EventItem.vue';
     .table{
         position: relative;
         z-index: 0;
+        border-bottom-left-radius:5px ;
+        border-bottom-right-radius:5px ;
+        border: 2px #20a0ff solid;
     }
 </style>

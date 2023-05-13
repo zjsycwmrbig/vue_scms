@@ -1,28 +1,28 @@
 <template>
   <div >
     
-    <div class="text">
+    <div class="text_1">
         {{weekday}}
     </div>
-
+    
     <div class="eventshow">
         <div class="shape" v-show="store.isClassBox">
             
         </div>
         <!-- 这是显示每个信息的地方 -->
         <div :class="{eventbox:true,eventbox_class:store.isClassBox}">
-            <div class="boxshape" v-for="(boxItem,boxIndex) in 14" :key="boxIndex" v-show="store.isClassBox" :style="SetShape(boxIndex)" @click="addClass(weekindex,boxIndex)">
-                <el-text class="textshape">
+            <div class="boxshape" v-for="(boxItem,boxIndex) in 12" :key="boxIndex" v-show="store.isClassBox" :style="SetShape(boxIndex)" @click="addClass(weekindex,boxIndex)">
+                <el-text class="text_2">
                     第{{ boxItem }}节
                 </el-text>
             </div>        
 
 
             <div class="eventcard" v-for="(item,itemIndex) in weekdata" :key="itemIndex" :style="SetItem(item)" @mouseenter="store.eventShow = false;store.showEvent = item" @mouseleave="store.eventShow = true" v-show="store.className == '' || item.group == store.className">
-                <el-text truncated="true" class="title" style="opacity: 1;">
+                <div class="title">
                     {{ item.title }}
-                </el-text>
-                <el-button size="small" class="delete" :icon="Delete" plain="true" text="true" @click="store.DeleteItem(item)"></el-button>
+                </div>
+                <el-button  class="delete" :icon="Delete" plain="true" text="true" @click="store.DeleteItem(item)"></el-button>
             </div>
             
 
@@ -109,6 +109,15 @@ import { ElNotification } from 'element-plus'
 </script>
 
 <style scoped>
+    .text_1{
+        color: #20a0ff;
+        text-align: center;
+        width: 100%;
+        font-size: 1.5rem;
+        font-weight: 700;
+        padding-bottom: 4px;
+        border-bottom:2px #20a0ff dotted ;
+    }
     .shape{
         position:absolute;
         top: 0vh;
@@ -117,17 +126,19 @@ import { ElNotification } from 'element-plus'
         transform:translatex(-50%);
     }
 
-    .textshape{
-        margin: 0 auto;
+    .text_2{
+        margin: auto;
     }
     .boxshape{
+        display: flex;
+        align-items: center;
         position: absolute;
         box-sizing: border-box;
         background: transparent;
         /* margin: 0 auto; */
         left: 50%;
         transform: translateX(-50%);
-        border: 1px blue solid;
+        border: 1px #20a0ff dotted;
         height: 6vh;
         width: 60%;
         z-index: 1;
@@ -138,11 +149,12 @@ import { ElNotification } from 'element-plus'
     .eventcard{
         box-sizing: border-box;
         position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         left: 50%;
         transform:translatex(-50%);
-        padding:0 2px;
         border-radius: 10%;
-        /* margin-top: 2px; */
         border: 1px solid #e4e7ed;
         width: 60%;
         display: flex;
@@ -156,8 +168,8 @@ import { ElNotification } from 'element-plus'
         width: 100%;
         overflow-x: hidden;
         overflow-y: scroll;
-        /* 8 到 22 */
-        height: 84vh;
+        /* 8 到 20 */
+        height: 72vh;
     }
     .eventshow::-webkit-scrollbar {  display: none;}
     .eventbox{
@@ -165,7 +177,7 @@ import { ElNotification } from 'element-plus'
         height: 144vh;
         position: relative;
         z-index: 0;
-        /* transform: translateY(-48vh); */
+        
         /* 默认先到8点的那个 */
     }
     /* 特殊的eventbox，可以实现对齐到8点 */
@@ -173,17 +185,21 @@ import { ElNotification } from 'element-plus'
         transform: translateY(-48vh);
     }
 
-    .text{
-        text-align: center;
-        width: 100%;
-    }
     .title{
-        margin:auto 0;
+        height: 4vh;
+        width: 95%;
+        margin: auto;
         overflow: hidden;
+        text-overflow: ellipsis !important;
     }
 
     .delete{
         position: absolute;
+        width: 1vh;
+        height: 1vh;
+        font-size: 1vh;
+        margin: 0;
+        padding: 2px;
         top: 0;
         right: 0;
     }
