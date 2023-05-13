@@ -1,7 +1,11 @@
 <template>
-  <el-row justify="space-around" class="table">
+  
+  <el-row  justify="space-around" class="table">
+    <!-- 切换按钮 -->
+    
+
     <el-col v-for="index in 7" :key="index" :span="3">
-        <EventItem :weekday="WeekDay[index-1]" :weekdata="store.weekData[index-1]==null?null:store.weekData[index-1].list"/>
+        <EventItem :weekindex="index" :weekday="WeekDay[index-1]" :weekdata="store.weekData[index-1]==null?null:store.weekData[index-1].list"/>
     </el-col>
   </el-row>
 </template>
@@ -18,16 +22,26 @@ import EventItem from './EventItem.vue';
         setup(){
             let store = useEventTableStore()
             let WeekDay = ["星期一","星期二","星期三","星期四","星期五","星期六","星期日"]
+
+            
             return{
                 store,
                 WeekDay,
+             
             }
         }
     }
 </script>
 
 <style scoped> 
+    .tabshow{
+        position: absolute;
+        width: 5vw;
+        right: -5vw;
+        top: 0;
+    }
     .table{
+        position: relative;
         z-index: 0;
     }
 </style>

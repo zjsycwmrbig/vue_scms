@@ -185,6 +185,7 @@ const useTimeStore = defineStore('time',{
         return{
             GlobalTime:Date,
             Timespeed:1,         //正常速率
+            ringTemp:false//标注是否该弹出通知
         }
     },
     actions:{
@@ -206,45 +207,135 @@ const useTimeStore = defineStore('time',{
         //根据二分算法实现定位
         LocateItem(){
             let event = useEventTableStore()
-            let nowTime = this.GlobalTime.getTime()
-            //二分准备
-            let rightIndex = event.dataList.length//坐标
-            let leftIndex = 0
-            let midIndex = Math.floor((leftIndex + rightIndex)/2)
-
-            //二分查询到一个--- |某个事件之后的事件 ---
-            while(rightIndex > leftIndex){
-                midIndex = Math.floor((leftIndex + rightIndex)/2)
-                let indexItem = event.weekData[event.dataList[midIndex].weekIndex].list[event.dataList[midIndex].index]
-                let det = indexItem.begin + indexItem.length  - nowTime
-                
-                if(det >= 0){
-                    rightIndex = midIndex
-                }else{
-                    leftIndex = midIndex + 1
-                }
-            }
-            
-            let item
-            let progress
-            event.summary.done = midIndex
-            if(event.dataList.length!=0){
-                //正在进行和还没进行(一般是0的情况)的情况
-                item = event.weekData[event.dataList[midIndex].weekIndex].list[event.dataList[midIndex].index]
-                progress = (((nowTime - item.begin)*100) / (item.length)).toFixed(1)
+            if(event.dataList.length == 0){
+                event.nowEvent.item = null
+                event.nowEvent.progress = 0
+                event.summary.done = 0
             }else{
-                item = null
-                progress = 0
-            }
-            event.nowEvent.item = item
-            event.nowEvent.progress = progress
-        }
+                let left = 0;
+                let right = event.dataList.length - 1;
+                let index = -1;
+                let value = this.GlobalTime.getTime()
+                
+                // 二分查找 value 的位置
+                while (left <= right) {
+                  let mid = Math.floor((left + right) / 2);
+                  let indexItem = event.weekData[event.dataList[mid].weekIndex].list[event.dataList[mid].index]
+                  let IndexVaule = indexItem.begin + indexItem.length
+                  if (IndexVaule === value) {
+                    index = mid;
+                    break;
+                  } else if (IndexVaule < value) {
+                    left = mid + 1;
+                  } else {
+                    right = mid - 1;
+                  }
+                }
+                
+                // 如果 value 不在数组中，则找到离其最近的较大的值的位置
+                if (index === -1) {
+                  index = left;
+                }
+                // 从该位置开始向后遍历数组，找到第一个大于 value 的元素
+                
+                while (index < event.dataList.length && event.weekData[event.dataList[index].weekIndex].list[event.dataList[index].index].begin + event.weekData[event.dataList[index].weekIndex].list[event.dataList[index].index].length <= value) {
+                  index++;
+                }
+                let item
+                let progress
+                // 如果找不到这样的元素，则说明 value 是数组中的最大元素，没有下一个数据,自然也不提醒
+                if (index === event.dataList.length) {
+                    item = null
+                    progress = 0
+                    event.summary.done = index
+                }else{
+                    //正在进行和还没进行(一般是0的情况)的情况
+                    item = event.weekData[event.dataList[index].weekIndex].list[event.dataList[index].index]
+                    progress = (((value - item.begin)*100) / (item.length)).toFixed(1)
+                    event.summary.done = index
+                    if(progress < 0){
+                        // 现在的事项就是需要和ringTime进行比较提醒的事件
+                        let det = item.begin - value
+                        if(det < event.ringTime * 60 * 60 * 1000 ){
+                            //提醒一下
+                            if(this.ringFlag == false){
+                                ElNotification({
+                                    title:item.title + event.ringTime + '小时后就要开始了',
+                                    message: '闹钟提醒',
+                                    type: 'warning',
+                                })
+                            }
+                            this.ringFlag = true
+                        }else{
+                            this.ringFlag = false
+                        }
+                    }else{
+                        if(index + 1 != event.dataList.length){
+                            //还有下一个
+                            let next = event.weekData[event.dataList[index+1].weekIndex].list[event.dataList[index+1].index]
+                            let det = next.begin - value
+                            if(det < event.ringTime * 60 * 60 * 1000 ){
+                            //提醒一下
+                            if(this.ringFlag == false){
+                                ElNotification({
+                                    title:next.title + event.ringTime + '小时后就要开始了',
+                                    message: '闹钟提醒',
+                                    type: 'warning',
+                                })
+                            }
+                                this.ringFlag = true
+                            }else{
+                                this.ringFlag = false
+                            }
+                        }
+                    }
+                }
+                event.nowEvent.item = item
+                event.nowEvent.progress = progress
+            }     
+        },
+        // tempLocateItem(){
+        //     let event = useEventTableStore()
+        //     let nowTime = this.GlobalTime.getTime()
+        //     //二分准备
+        //     let rightIndex = event.dataList.length//坐标
+        //     let leftIndex = 0
+        //     let midIndex = Math.floor((leftIndex + rightIndex)/2)
+
+        //     //二分查询到一个--- |某个事件之后的事件 ---
+        //     while(rightIndex > leftIndex){
+        //         midIndex = Math.floor((leftIndex + rightIndex)/2)
+        //         let indexItem = event.weekData[event.dataList[midIndex].weekIndex].list[event.dataList[midIndex].index]
+        //         let det = indexItem.begin + indexItem.length  - nowTime
+                
+        //         if(det >= 0){
+        //             rightIndex = midIndex
+        //         }else{
+        //             leftIndex = midIndex + 1
+        //         }
+        //     }
+            
+        //     let item
+        //     let progress
+        //     event.summary.done = midIndex
+        //     if(event.dataList.length!=0){
+        //         //正在进行和还没进行(一般是0的情况)的情况
+        //         item = event.weekData[event.dataList[midIndex].weekIndex].list[event.dataList[midIndex].index]
+        //         progress = (((nowTime - item.begin)*100) / (item.length)).toFixed(1)
+        //     }else{
+        //         item = null
+        //         progress = 0
+        //     }
+        //     event.nowEvent.item = item
+        //     event.nowEvent.progress = progress
+        // }
     }
 })
 
 //事件表
 const useEventTableStore = defineStore('eventtable',{
     state:()=>{
+        let mapStore =  useMapStore()
         return{
             eventShow:true,
             eventData:Object,//接收到的数据,按照时间分类
@@ -253,12 +344,26 @@ const useEventTableStore = defineStore('eventtable',{
                 item:null,
                 progress:Number
             },//显示当下事件
+            ringTime:1,//提前。。提醒日程
             showEvent:Object,//显示hover时的事件
             dataList:Array, //按照时间找到索引
             summary:{
                 total:Number,
                 done:Number,
-            }//总结数据
+            },//总结数据
+            isClassBox:false,
+            className:'',
+            // 共享出来
+            form:{
+                name: '',
+                date: '',
+                end:'',
+                hourLength:1,
+                minuteLength:0,
+                circle:0,
+                type: '',
+                location:mapStore.mapForm.location
+            }
         }
     },
 
@@ -279,10 +384,11 @@ const useEventTableStore = defineStore('eventtable',{
             })
         },
         // 添加事项数据
-        AddItem(form){
+        AddItem(){
+            let form = this.form
             let event = useEventTableStore()
             let map = useMapStore()
-            let datebegin = form.date1.getTime()
+            let datebegin = form.date.getTime()
             axios.post('/api/add/item',{
                 type:form.type,
                 title:form.name,
@@ -351,8 +457,9 @@ const useEventTableStore = defineStore('eventtable',{
             }
             event.summary.total = event.dataList.length //更新summary的数据
         }
-    }
+}
 })
+
 
 //地图
 const useMapStore = defineStore('map',{

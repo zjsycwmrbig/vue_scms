@@ -8,13 +8,13 @@
     >
       <el-form :model="form" label-position="top">
         <el-form-item label="添加至">
-          <el-select v-model="form.type" placeholder="选择事项集">
+          <el-select v-model="eventStore.form.type" placeholder="选择事项集">
             <el-option v-for="(item,index) in userStore.userData.owner" :key="index" :label="index==0?'个人事项':item" :value="index" />
           </el-select>
         </el-form-item>
       <el-form-item label="事项名称及地点">
       <el-col :span="16">
-        <el-input v-model="form.name" />
+        <el-input v-model="eventStore.form.name" />
       </el-col>
       <el-col :span="8">
         <el-button
@@ -31,7 +31,7 @@
     <!-- 如果是周期性事件,增加一个结束 -->
     <el-form-item label="事项时间">
       <el-date-picker
-        v-model="form.date1"
+        v-model="eventStore.form.date"
         type="datetime"
         placeholder="Select date and time"
         :default-time="defaultTime"
@@ -42,11 +42,11 @@
       <el-row :justify="'end'">
         <el-col :span="12">
           <div>
-            <el-input-number v-model="form.hourLength" :step="1" min="0" max="23" placeholder="1"/>时
+            <el-input-number v-model="eventStore.form.hourLength" :step="1" min="0" max="23" placeholder="1"/>时
           </div>
         </el-col>
         <el-col :span="12">
-          <div><el-input-number v-model="form.minuteLength" :step="10" min="0" max="59" placeholder="00"/>分</div>
+          <div><el-input-number v-model="eventStore.form.minuteLength" :step="10" min="0" max="59" placeholder="00"/>分</div>
         </el-col>
       </el-row>
         
@@ -54,21 +54,21 @@
 
     </el-form-item>      
   <el-form-item label="周期性">
-    <el-select v-model="form.circle" placeholder="please select your zone">
+    <el-select v-model="eventStore.form.circle" placeholder="please select your zone">
         <el-option v-for="(item,index) in circles" :key="index" :label="item.label" :value="item.value"/>
     </el-select>
   </el-form-item>
 
-  <el-form-item v-show="form.circle != 0">
+  <el-form-item v-show="eventStore.form.circle != 0">
     <el-date-picker
-        v-model="form.end"
+        v-model="eventStore.form.end"
         type="date"
         placeholder="选择结束时间"
         :shortcuts="shortcuts"
       />
   </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="eventStore.AddItem(form)">提交</el-button>
+      <el-button type="primary" @click="eventStore.AddItem()">提交</el-button>
     </el-form-item>
   </el-form>
   </el-drawer>

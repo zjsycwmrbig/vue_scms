@@ -5,14 +5,19 @@
         :show-close="false"
         class="operation"
     >
+        <!-- 时间设置 -->
         <TimeShow/>
         <el-divider/>
+        <!-- 闹钟设置 -->
+        <el-card>
+            闹钟提示时间 <el-input-number v-model="event.ringTime" :step="1" min="0" max="12" placeholder="1"/>
+        </el-card>
     </el-drawer>
 </template>
 
 <script>
 import TimeShow from './TimeShow.vue';
-import { useOperationStore } from '@/store/pinia';
+import { useEventTableStore, useOperationStore } from '@/store/pinia';
 
 
 export default {
@@ -21,9 +26,10 @@ export default {
     },
     setup(){
         let store = useOperationStore()
-
+        let event = useEventTableStore()
         return{
-            store
+            store,
+            event
         }
     }
 }

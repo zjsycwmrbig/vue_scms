@@ -53,13 +53,10 @@ import { useOperationStore } from '@/store/pinia'
         setup(){
             let asideStore = useOperationStore()
             let msg = ref("SCMS-在路上")
-            function changestate(){
-                asideStore.messageShow = !asideStore.messageShow;
-            }
+            
             return{
                 msg,
-                asideStore,
-                changestate
+                asideStore    
             }
         }
     }
