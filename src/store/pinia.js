@@ -436,9 +436,23 @@ const useMapStore = defineStore('map',{
             mapy: 1195,
             points:Object,
             mapForm:{
-                selected:false,
                 location:-1,
+                selected:false,
+                selecting:false,
+
+                eventSelected:false,//是否已经选好了
+                eventSelecting:false,//是否正在选择
+                endSelected:false,
+                endSelecting:false,
+                startSelected:false,
+                startSelecting:false,
+                
+                eventLocation:-1,
+                startLocation:-1,
+                endLocation:-1,
                 formshow:true
+                // 为什么添加selecting：根据selecting来判断，用户正在改event的地点，还是start，还是end，从而把location的值赋给相应的变量
+                // 为什么保留selected: {{ mapStore.mapForm.selected == false ? 要根据这个判断按钮文字显示什么
             }
         }
     },
@@ -493,7 +507,8 @@ const useOperationStore = defineStore('aside',{
             searchShow:false,
             userCardShow :false,
             userCenterShow:false,
-            messageShow:false
+            messageShow:false,
+            navigationShow:false
         }
     },
 })

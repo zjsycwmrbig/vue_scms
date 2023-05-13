@@ -16,7 +16,8 @@
             trigger="hover"
         >
             <template #reference>
-                <div :class="PointStyle(item)" :style="LocatePoint(item)" @click="store.mapForm.location = item.pid,store.mapForm.selected=true,store.show=false"></div>
+                <div :class="PointStyle(item)" :style="LocatePoint(item)" @click="ChoosePoint(item)"></div>
+                <!-- store.mapForm.location = item.pid,store.mapForm.selected=true,store.mapForm.selecting=false,store.show=false -->
             </template>
         </el-popover>
         </div>
@@ -48,10 +49,31 @@ import { useMapStore } from '@/store/pinia';
                 }
             }
 
+            function ChoosePoint(item){
+                // store.mapForm.location = item.pid,store.mapForm.selected=true,store.mapForm.selecting=false,store.show=false
+                if(store.mapForm.eventSelecting == true){
+                    store.mapForm.eventLocation = item.pid;
+                    store.mapForm.eventSelected = true;//已经选好了event地点
+                    store.mapForm.eventSelecting = false;//已经选好了event地点，不再是进行时
+                }
+                else if(store.mapForm.startSelecting == true){
+                    store.mapForm.startLocation = item.pid;
+                    store.mapForm.startSelected = true;
+                    store.mapForm.startSelecting = false;
+                }
+                else if(store.mapForm.endSelecting == true){
+                    store.mapForm.endLocation = item.pid;
+                    store.mapForm.endSelected = true;
+                    store.mapForm.endSelecting = false;
+                }
+                store.show = false;
+            }
+
             return {
                 store,
                 LocatePoint,
-                PointStyle
+                PointStyle,
+                ChoosePoint
             }
         }
     }
