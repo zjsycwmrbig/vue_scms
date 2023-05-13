@@ -33,7 +33,7 @@
 
 <script>
 import { Delete } from '@element-plus/icons-vue'
-import { useEventTableStore, useLoginStore, useTimeStore ,useOperationStore} from '@/store/pinia'
+import { useEventTableStore, useLoginStore, useTimeStore ,useOperationStore, useCssStore} from '@/store/pinia'
 import { ElNotification } from 'element-plus'
     export default {
         props:['weekday','weekdata','weekindex'],
@@ -42,15 +42,16 @@ import { ElNotification } from 'element-plus'
             let store = useEventTableStore()
             let user = useLoginStore()
             let option = useOperationStore()
+            let css = useCssStore()
             //颜色的数组,可以根据type显示不同颜色
-            let color = ['#fde2e2','#fefff0']
             let SetItem = (item)=>{
                 let now = new Date(item.begin)
                 let date = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
                 return {
                     height:(item.length*100 / parseFloat(86400000)).toFixed(2) + '%' ,
                     top:(((item.begin - date) * 100 )/ parseFloat(86400000)).toFixed(2)+'%',
-                    backgroundColor: color[item.type],
+                    backgroundColor: css.GetBGC(item.type),
+                    borderColor : css.GetBDC(item.type)
                 }
             }
             // 修改type circle begin等值达到自动填充的效果
@@ -139,7 +140,7 @@ import { ElNotification } from 'element-plus'
         position: absolute;
         left: 50%;
         transform:translatex(-50%);
-        padding: 2px;
+        padding:0 2px;
         border-radius: 10%;
         /* margin-top: 2px; */
         border: 1px solid #e4e7ed;

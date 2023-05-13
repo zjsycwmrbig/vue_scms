@@ -6,6 +6,8 @@
             size="large"
             class="aside"
         >
+            <!-- 新建一个事件模块 -->
+            
             <EventsSummary/>
             <NowEvent/>  
         </el-space> 

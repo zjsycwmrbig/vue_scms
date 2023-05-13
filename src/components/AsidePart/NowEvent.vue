@@ -1,12 +1,18 @@
 <template>
-    <div class="nowevent">
-        <!--  -->
-        <div class="now">
-            <el-progress v-if="store.nowEvent.item != null && store.eventShow" :percentage="store.nowEvent.progress" :show-text="true" :stroke-linecap="butt"/>
+        <div class="eventshow">
             <el-card class="box-card" v-show="store.eventShow">
             <template #header>
-                <div class="card-header">
-                    <span>{{ store.nowEvent.item == null ? "今日无事": store.nowEvent.item.title}}</span>
+                <div class="head">
+                    <span style="font-size: 1.2rem;">{{ store.nowEvent.item == null ? "今日无事": store.nowEvent.item.title}}</span>
+                    <span>
+                        <el-tag
+                            type="info"
+                            effect="dark"
+                            round
+                        >
+                          {{ store.nowEvent.item != null ? store.nowEvent.item.group : ''}}
+                        </el-tag>
+                    </span>
                 </div>
             </template>
             <div class="body" v-if="store.nowEvent.item != null">
@@ -43,16 +49,25 @@
                         </el-col>
                 </el-row>
             </div>
-        </el-card>
-        </div>
+            <el-divider></el-divider>
+            <div style="height:2vh">
+                <el-progress  :show-text="false" :percentage="store.nowEvent.progress" :stroke-width="15" striped striped-flow/>    
+            </div>
+            </el-card>
 
-        
-        <div class="show">
-            <!-- 鼠标悬浮 -->
             <el-card class="box-card" v-if="!store.eventShow">
             <template #header>
-                <div class="card-header">
-                    <span>{{ store.showEvent.title }}</span>
+                <div class="head">
+                    <span style="font-size: 1.2rem;">{{ store.showEvent.title}}</span>
+                    <span>
+                        <el-tag
+                            type="info"
+                            effect="dark"
+                            round
+                        >
+                          {{ store.showEvent != null ? store.showEvent.group : ''}}
+                        </el-tag>
+                    </span>
                 </div>
             </template>
             <div class="body" v-if="store.showEvent!=null">
@@ -89,9 +104,10 @@
                         </el-col>
                 </el-row>
             </div>
+            <el-divider></el-divider>
+            <el-progress  :show-text="false" :percentage="100" :stroke-width="15" striped striped-flow/>    
         </el-card>
         </div>
-    </div>
 </template>
 
 <script>
@@ -116,11 +132,16 @@ export default {
 }
 </script>
 
-<style>
-.nowevent{
+<style scoped>
+.eventshow{
     width: 100%;
+    height: 30vh;
 }
-.box-card{
-    height: 100%;
+.head{
+    display: flex;
+    justify-content: space-between;
+    color: #20a0ff;
+    font-size: 1.4rem;
+    font-weight: 600;
 }
 </style>
