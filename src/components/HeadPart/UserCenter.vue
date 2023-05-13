@@ -67,6 +67,8 @@
                 </el-card>
             </div>
             </el-tab-pane>
+
+
             <el-tab-pane label="我的群组" style="width: 30vw; margin: 0 auto;">
               <div class="group">
               
@@ -88,7 +90,8 @@
                             :disable-transitions="false"
                             @click="org.showOrg = index"
                             @close="RemoveOrg(org)"
-                            effect="dark"
+                            
+                            :color="GetCss(index)"
                         >
                         {{ orgname }}
                       </el-tag>
@@ -150,6 +153,7 @@
                       size="large"
                       wrap="true"
                     >
+
                     <el-tag
                       v-for="(org,index) in user.userData.player"
                       :key="index"
@@ -157,7 +161,7 @@
                       closable
                       :disable-transitions="false"
                       @close="RemoveOrg(org)"
-                      effect="dark"
+                      :color="GetCss(-index)"
                     >
                       {{ org }}
                     </el-tag>
@@ -180,12 +184,13 @@
             </div>
             </el-tab-pane>
         </el-tabs>
+
       </el-menu>
     </el-drawer>
 </template>
 
 <script>
-import { useLoginStore, useOperationStore } from '@/store/pinia'
+import { useCssStore, useLoginStore, useOperationStore } from '@/store/pinia'
 import { reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 export default {
@@ -193,9 +198,8 @@ export default {
     
     setup(){
         let user = useLoginStore()
-
         let option = useOperationStore()
-
+        let cssStore = useCssStore()
         let form = reactive({
             editword:false,
             editname:false,
@@ -251,19 +255,24 @@ export default {
         const RemoveOrg = function(){
 
         }
-
+        //GetCss
+        const GetCss = function(index){
+          return cssStore.GetBGC(index)
+        }
         return{
             option,
             form,
             user,
             org,
             userSearch,
+            cssStore,
             beforeAvatarUpload,
             submitName,
             submitWord,
             CreateOrg,
             JoinOrg,
-            RemoveOrg
+            RemoveOrg,
+            GetCss
         }
     }
 }

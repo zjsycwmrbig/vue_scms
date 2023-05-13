@@ -528,21 +528,43 @@ const useSearchStore = defineStore('search',{
 const useCssStore = defineStore('css',{
     state:()=>{
         return{
-            OBGC:['#66CCCC','#FF9999','#99CC33','#66CCCC','#CC9999'],//背景颜色组
-            OBDC:['#CCFF66','#FFCC99','#CCFF00','#666699','#666699'],//
-            PBGC:[''],
-            PBDC:[]
+            OWNER:5,
+            PLAYER:1,
+            OBGC:['#fef1f1','#f0f4ff','#CC9999','#99CC33','#66CCCC','#66CCCC','#FF9999',],//背景颜色组
+            OBDC:['#facac8','#c1d2fc','#666699','#CCFF00','#666699','#CCFF66','#FFCC99',],//边界颜色
+            PBGC:['#eff0f1'],
+            PBDC:['#e9ebed']
         }
     },
     actions:{
         //根据ID的值返回应有的owner样式,是偏彩色,ID是用来随机的
-        GetOwnerCss(typeID){
-            return typeID
+        GetBGC(typeID){
+            if(typeID >= 0){
+                return this.OBGC[typeID%this.OWNER]    
+            }else{
+                return this.PBGC[0]    
+            }
         },
-        //返回player样式,是偏黑深色
-        GetPlayerCss(typeID){
-            return typeID
-        }
+        GetBDC(typeID){
+            if(typeID >= 0){
+                return this.OBDC[typeID%this.OWNER]    
+            }else{
+                return this.PBDC[0]    
+            }
+        },
+        // GetOwnerBGC(typeID){
+        //     return this.OBGC[typeID%this.OWNER]
+        // },
+        // GetOwnerBDC(typeID){
+        //     return this.OBDC[typeID%this.OWNER]
+        // },
+        // //返回player样式,是偏黑深色
+        // GetPlayerBGC(){
+        //     return this.PBGC[0]
+        // },
+        // GetPlayerBDC(){
+        //     return this.PBDC[0]
+        // }
     }
 })
 
