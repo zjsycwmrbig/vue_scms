@@ -294,41 +294,6 @@ const useTimeStore = defineStore('time',{
                 event.nowEvent.progress = progress
             }     
         },
-        // tempLocateItem(){
-        //     let event = useEventTableStore()
-        //     let nowTime = this.GlobalTime.getTime()
-        //     //二分准备
-        //     let rightIndex = event.dataList.length//坐标
-        //     let leftIndex = 0
-        //     let midIndex = Math.floor((leftIndex + rightIndex)/2)
-
-        //     //二分查询到一个--- |某个事件之后的事件 ---
-        //     while(rightIndex > leftIndex){
-        //         midIndex = Math.floor((leftIndex + rightIndex)/2)
-        //         let indexItem = event.weekData[event.dataList[midIndex].weekIndex].list[event.dataList[midIndex].index]
-        //         let det = indexItem.begin + indexItem.length  - nowTime
-                
-        //         if(det >= 0){
-        //             rightIndex = midIndex
-        //         }else{
-        //             leftIndex = midIndex + 1
-        //         }
-        //     }
-            
-        //     let item
-        //     let progress
-        //     event.summary.done = midIndex
-        //     if(event.dataList.length!=0){
-        //         //正在进行和还没进行(一般是0的情况)的情况
-        //         item = event.weekData[event.dataList[midIndex].weekIndex].list[event.dataList[midIndex].index]
-        //         progress = (((nowTime - item.begin)*100) / (item.length)).toFixed(1)
-        //     }else{
-        //         item = null
-        //         progress = 0
-        //     }
-        //     event.nowEvent.item = item
-        //     event.nowEvent.progress = progress
-        // }
     }
 })
 
