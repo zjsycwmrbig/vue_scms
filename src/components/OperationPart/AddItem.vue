@@ -21,9 +21,9 @@
           type="primary"
           text
           bg
-          @click="mapStore.show=true,mapStore.mapForm.eventSelecting=true,mapStore.mapForm.eventSelected=false"
+          @click="mapStore.show=true,mapStore.mapForm.selected=false"
           >
-            {{ mapStore.mapForm.eventSelected == false ?"选择地点":(mapStore.points[mapStore.mapForm.eventLocation-1].name) }}
+            {{ mapStore.mapForm.selected == false ?"选择地点":(mapStore.points[mapStore.mapForm.location-1].name) }}
           </el-button>
       </el-col>
       
