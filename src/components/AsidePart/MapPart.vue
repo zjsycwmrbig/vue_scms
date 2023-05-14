@@ -17,7 +17,7 @@
         >
             <template #reference>
                 <div :class="PointStyle(item)" :style="LocatePoint(item)" @click="ChoosePoint(item)"></div>
-                <!-- store.mapForm.location = item.pid,store.mapForm.selected=true,store.mapForm.selecting=false,store.show=false -->
+                
             </template>
         </el-popover>
         </div>

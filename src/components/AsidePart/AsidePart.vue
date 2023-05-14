@@ -37,7 +37,6 @@ export default {
 <style scoped>
 .aside{
     position: relative;
-    /* border: 2px blanchedalmond solid; */
     padding: 2px;
     width: 100%;
 }

@@ -16,12 +16,12 @@
                 
                 <el-upload
                   class="avatar-uploader"
-                  action="api/upload"
+                  action="api/user/upload"
                   :show-file-list="false"
                   :on-success="handleAvatarSuccess"
                   :before-upload="beforeAvatarUpload"
                 >
-                  <img src="https://w.wallhaven.cc/full/m3/wallhaven-m3zjx1.jpg" class="avatar"/>
+                  <img :src="user.userData.hasImage==false?'api/image/default.png':'api/image/'+user.userData.username+'.png'" class="avatar"/>
                 </el-upload>
                 
                 <div class="info">
@@ -241,6 +241,13 @@ export default {
           }
           return true
         }
+        //头像上传后的处理
+        const handleAvatarSuccess=function(response){
+          if(response=='OK'){
+            user.userData.hasImage = false
+            user.userData.hasImage = true
+          }
+        }
         //创建组织
         const CreateOrg = function(){
             org.inputCreate = false
@@ -267,6 +274,7 @@ export default {
             userSearch,
             cssStore,
             beforeAvatarUpload,
+            handleAvatarSuccess,
             submitName,
             submitWord,
             CreateOrg,
