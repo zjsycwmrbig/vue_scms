@@ -8,23 +8,26 @@
     >
       <el-form :model="form" label-position="top">
         <el-form-item label="添加至">
-          <el-select v-model="eventStore.form.type" placeholder="选择事项集">
+          <el-select v-model="eventStore.form.indexID" placeholder="选择事项集">
             <el-option v-for="(item,index) in userStore.userData.owner" :key="index" :label="index==0?'个人事项':item" :value="index" />
           </el-select>
         </el-form-item>
       <el-form-item label="事项名称及地点">
-      <el-col :span="16">
+      <el-col :span="12">
         <el-input v-model="eventStore.form.name" />
       </el-col>
-      <el-col :span="8">
+      <el-col :span="6">
         <el-button
           type="primary"
           text
           bg
-          @click="mapStore.show=true,mapStore.mapForm.eventSelecting=true,mapStore.mapForm.eventSelected=false"
+          @click="mapStore.mapForm.selectType = 0,mapStore.show=true,mapStore.mapForm.selected=false"
           >
-            {{ mapStore.mapForm.eventSelected == false ?"选择地点":(mapStore.points[mapStore.mapForm.eventLocation-1].name) }}
-          </el-button>
+            {{ mapStore.mapForm.location == '' ? "选择地点" : (mapStore.points[mapStore.mapForm.location-1].name) }}
+        </el-button>
+      </el-col>
+      <el-col :span="6">
+        <el-input v-model="eventStore.form.locationData" placeholder="请输入备注信息"></el-input>
       </el-col>
       
     </el-form-item>
@@ -49,9 +52,6 @@
           <div><el-input-number v-model="eventStore.form.minuteLength" :step="10" min="0" max="59" placeholder="00"/>分</div>
         </el-col>
       </el-row>
-        
-        
-
     </el-form-item>      
   <el-form-item label="周期性">
     <el-select v-model="eventStore.form.circle" placeholder="please select your zone">
@@ -66,6 +66,14 @@
         placeholder="选择结束时间"
         :shortcuts="shortcuts"
       />
+  </el-form-item>
+  <!-- 获得事件类型的处理 -->
+  <el-form-item label="事项类型">
+    <el-radio-group v-model="eventStore.form.type" size="large">
+      <el-radio-button label="日常课程" />
+      <el-radio-button label="课外活动" />
+      <el-radio-button label="临时事务" />
+    </el-radio-group>
   </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="eventStore.AddItem()">提交</el-button>

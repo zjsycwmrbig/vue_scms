@@ -10,6 +10,7 @@
             <TimeShow/>
             <EventsSummary/>
             <NowEvent/>  
+            <ClashPart/>
         </el-space> 
     </el-col>
 </template>
@@ -18,11 +19,13 @@
 import EventsSummary from './EventsSummary.vue';
 import NowEvent from './NowEvent.vue';
 import TimeShow from './TimeShow.vue';
+import ClashPart from './ClashPart.vue';
 export default {
     components:{
         NowEvent,
         EventsSummary,
-        TimeShow
+        TimeShow,
+        ClashPart
     },
     setup(){
         let WeekDay = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六",]

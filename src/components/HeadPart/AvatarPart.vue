@@ -1,7 +1,9 @@
 <template>
     <!-- 头像外显 -->
     <div class="avatarpart" @mouseenter.capture="option.userCardShow = true" @mouseleave="option.userCardShow = false">
-        <img :src="state.userAvatar"/>
+        <div class="avatar">
+            <img class="image" :src="user.userData.hasImage==false?'api/image/default.png':'api/image/'+user.userData.username+'.png'"/>
+        </div>
         <ShowCard/>
     </div>
     <!-- 选项卡 -->
@@ -9,8 +11,7 @@
 </template>
 
 <script>
-import { reactive } from 'vue'
-import { useOperationStore} from '@/store/pinia'
+import { useLoginStore, useOperationStore} from '@/store/pinia'
 import ShowCard from './ShowCard.vue'
 import UserCenter from './UserCenter.vue'
 
@@ -21,13 +22,11 @@ export default{
     },
     setup() {
         let option = useOperationStore()
+        let user = useLoginStore()
 
-        const state = reactive({
-            userAvatar:'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-        })
 
         return{
-            state,
+            user,
             option
         }
     },
@@ -50,15 +49,22 @@ export default{
     transform: scale(1);
     z-index: 1000;
 }
-.avatarpart img {
+.avatar{
     position: relative;
-    height: 100%;
     width: 100%;
+    height: 100%;
+    overflow: hidden;
     border-radius: 50%;    
     transform: scale(1);
     z-index: 1001;
 }
 
-
+.image{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    margin: 0 auto;
+}
 
 </style>

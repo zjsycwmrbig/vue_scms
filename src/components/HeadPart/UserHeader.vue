@@ -25,7 +25,7 @@
             </el-col>
             <!-- 中心标题 -->
             <el-col :span="16">
-                <el-text>{{ msg }}</el-text>
+                <el-text class="title">{{ msg }}</el-text>
             </el-col>
             <!-- 头像 -->
             <el-col :span="3">
@@ -78,5 +78,10 @@ import { useOperationStore } from '@/store/pinia'
     }
     .headrow{
         height: 5vh;
+    }
+    .title{
+        font-size: 3.0rem;
+        color: #20a0ff;
+        font-weight: 1000;
     }
 </style>

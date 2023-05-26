@@ -1,8 +1,8 @@
 <template>
   <el-card v-show="option.userCardShow" class="showcard">
         <div class="head">
-            <div class="name">张靳生</div>
-            <div class="word">上面摆下面寄</div>
+            <div class="name">{{ login.userData.netname == null ? '小茗同学' : login.userData.netname }}</div>
+            <div class="word">{{ login.userData.PersonalWord == null ? '这个人很懒,没有设置个性签名' : login.userData.PersonalWord }}</div>
         </div>
         
         <div class="count">
@@ -11,7 +11,7 @@
             <div class="countbox"><div class="countnum">{{ (login.userData.tips).length }}</div><div class="counttip">通知</div></div>        
         </div>
         
-        <el-divider><el-icon size="small"><Star /></el-icon></el-divider>
+        <el-divider class="divider"><el-icon size="small"><Star /></el-icon></el-divider>
         
         <div class="foot">
             <div class="option" @click="option.userCenterShow = true"><span>个人中心</span></div>
@@ -51,6 +51,14 @@ import { useLoginStore, useOperationStore } from '@/store/pinia'
         width: 100%;
         transform: scale(0.5);
     }
+    .name{
+        color: #20a0ff;
+        font-weight: 900;
+    }
+    .divider{
+        transform: scale(0.5);
+        transform: translateY(-2vh);
+    }
 
     .count{
         display: flex;
@@ -62,6 +70,7 @@ import { useLoginStore, useOperationStore } from '@/store/pinia'
 
     .countnum{
         transform: scale(1.5);
+        color: #20a0ff;
     }
     
     .counttip{
@@ -77,7 +86,6 @@ import { useLoginStore, useOperationStore } from '@/store/pinia'
         left: 50%;
         top: 50%;
         transform: translateX(-50%);
-        padding: 1vw;
         z-index: 0;
     }
 
@@ -86,13 +94,14 @@ import { useLoginStore, useOperationStore } from '@/store/pinia'
     }
 
     .option:hover{
-        background-color: #ccc;
+        color: #20a0ff;
         cursor: pointer;
     }
 
     .foot{
         display: flex;
         justify-content: space-around;
+        transform: translateY(-3vh);
     }
 
 </style>

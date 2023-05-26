@@ -50,8 +50,8 @@ import { ElNotification } from 'element-plus'
                 return {
                     height:(item.length*100 / parseFloat(86400000)).toFixed(2) + '%' ,
                     top:(((item.begin - date) * 100 )/ parseFloat(86400000)).toFixed(2)+'%',
-                    backgroundColor: css.GetBGC(item.type),
-                    borderColor : css.GetBDC(item.type)
+                    backgroundColor: css.GetBGC(item.indexID),
+                    borderColor : css.GetBDC(item.indexID)
                 }
             }
             // 修改type circle begin等值达到自动填充的效果

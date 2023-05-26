@@ -1,5 +1,6 @@
 <template>
         <div class="eventshow">
+            <!-- 当前事件 -->
             <el-card class="box-card" v-show="store.eventShow">
             <template #header>
                 <div class="head">
@@ -12,11 +13,17 @@
                         >
                           {{ store.nowEvent.item != null ? store.nowEvent.item.group : '闲'}}
                         </el-tag>
+                        <el-tag
+                            type="primary"
+                            effect="dark"
+                            round
+                        >
+                          {{ store.nowEvent.item != null ? eventType[store.nowEvent.item.type] : '闲'}}
+                        </el-tag>
                     </span>
                 </div>
             </template>
             <div class="body" >
-                <!-- v-if="store.nowEvent.item != null" -->
                 <el-row gutter="20">
                         <el-col :span="8">
                         <el-card class="box-card">
@@ -36,7 +43,12 @@
                                     <span>事项地点</span>
                                 </div>
                             </template>
-                            <el-text v-if="store.nowEvent.item != null">{{map.points[store.nowEvent.item.location-1]!=null?map.points[store.nowEvent.item.location-1].name:"无地点"}}</el-text>
+                            <el-text v-if="store.nowEvent.item != null">{{
+                                map.points[store.nowEvent.item.location-1]!=null?map.points[store.nowEvent.item.location-1].name:"无地点"
+                            }}
+                            <el-divider></el-divider>
+                            {{ store.nowEvent.item.locationData }}
+                            </el-text>
                             <el-text v-else class="text_1">假</el-text>
                         </el-card>
                     </el-col>
@@ -58,7 +70,7 @@
                 <el-progress  :show-text="false" :percentage="store.nowEvent.progress" :stroke-width="15" striped striped-flow/>    
             </div>
             </el-card>
-
+            <!-- 展示事件 -->
             <el-card class="box-card" v-if="!store.eventShow">
             <template #header>
                 <div class="head">
@@ -70,6 +82,13 @@
                             round
                         >
                           {{ store.showEvent != null ? store.showEvent.group : ''}}
+                        </el-tag>
+                        <el-tag
+                            type="primary"
+                            effect="dark"
+                            round
+                        >
+                          {{ store.showEvent != null ? eventType[store.showEvent.type] : '闲'}}
                         </el-tag>
                     </span>
                 </div>
@@ -123,6 +142,7 @@ export default {
         let state = useLoginStore()
         let time = useTimeStore()
         let map = useMapStore()
+        let eventType = ['日常课程','课外活动','临时事务']
         setInterval(()=>{
             if(state.loginstate == 1){
             time.LocateItem()//更新store中的数据
@@ -130,7 +150,8 @@ export default {
         },17)
         return {
             store,
-            map
+            map,
+            eventType
         }
     }
 }

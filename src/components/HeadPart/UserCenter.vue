@@ -28,10 +28,10 @@
                     <el-card class="item">
                     <template #header>
                       <div class="card-header">
-                        <span>用户名</span>
+                        <span >用户名</span>
                       </div>
                     </template>
-                    {{ user.userData.owner[0] }}
+                    {{ user.userData.username }}
                 </el-card>
 
                 <el-card class="item">
@@ -287,6 +287,12 @@ export default {
 </script>
 
 <style scoped>
+
+  .text_1{
+     color:  #20a0ff;
+     font-size: 2rem;
+     font-weight: 900;
+  }
     .avatar-uploader{
         display: flex;
         justify-content: center;

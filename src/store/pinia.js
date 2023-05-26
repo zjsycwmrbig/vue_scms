@@ -143,7 +143,8 @@ const useLoginStore = defineStore('Login',{
                     org:name
                 }
             }).then(function(respose){
-                let user = useLoginStore()    
+                let user = useLoginStore()   
+                 
                 if(respose.status == 200){
                     if(respose.data.res == true){
                         if(orgitem == 'create'){
@@ -158,6 +159,8 @@ const useLoginStore = defineStore('Login',{
                             type:"success",
                             position:"bottom-right"
                         })
+                        let event = useEventTableStore()
+                        event.GetWeekData()//更新下
                     }else{
                         ElNotification({
                             title:"操作失败",
@@ -195,14 +198,14 @@ const useTimeStore = defineStore('time',{
             // 开始时间并且定位进度
             this.GlobalTime = new Date()
             setInterval(() => {
-                this.GlobalTime = new Date(this.GlobalTime.getTime() + 17 * this.Timespeed)
+                this.GlobalTime = new Date(this.GlobalTime.getTime() + 250 * this.Timespeed)
                 if(this.GlobalTime.getDay() == 1){
-                    if(this.GlobalTime.getTime() < this.Timespeed * 17 * 3){
+                    if(this.GlobalTime.getTime() < this.Timespeed * 250 * 3){
                         event.GetWeekData() //更新数据
                     }
                 }
                 
-            }, 17)
+            }, 250)
         },
         //根据二分算法实现定位
         LocateItem(){
@@ -326,8 +329,10 @@ const useEventTableStore = defineStore('eventtable',{
                 hourLength:1,
                 minuteLength:0,
                 circle:0,
+                indexID:'',
                 type: '',
-                location:mapStore.mapForm.location
+                location:mapStore.mapForm.location,
+                locationData:''
             }
         }
     },
@@ -342,7 +347,6 @@ const useEventTableStore = defineStore('eventtable',{
                 }
             }).then(function(respose){
                 let event = useEventTableStore()
-                event.eventData = respose.data.events; //分页
                 event.weekData = respose.data.routines;//数组,包含index和数据
                 event.BuildDataList(respose.data.routines) //构建
                 event.show = true;
@@ -354,14 +358,23 @@ const useEventTableStore = defineStore('eventtable',{
             let event = useEventTableStore()
             let map = useMapStore()
             let datebegin = form.date.getTime()
+            let type = -1
+            switch(form.type){
+                case '日常课程':type = 0;break;
+                case '课外活动':type = 1;break;
+                case '临时事务':type = 2;break;
+            }
+            if(type == -1) type = 2//默认为临时事务
             axios.post('/api/add/item',{
-                type:form.type,
+                indexID:form.indexID,
+                type:type,
                 title:form.name,
                 location:map.mapForm.location,
                 circle:form.circle,
                 begin:datebegin,
                 end:form.end==''? (datebegin +form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000):(form.end.getTime()),
-                length:form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000
+                length:form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000,
+                locationData:form.locationData
             }).then(function(respose){
                 if(respose.data.res == true){
                     ElNotification({
@@ -372,6 +385,10 @@ const useEventTableStore = defineStore('eventtable',{
                     })
                     event.GetWeekData()
                 }else{
+                    let clashStore = useClashStore()
+                    
+                    clashStore.clashList = respose.data.clashList//赋值
+                    clashStore.clashFlag = true
                     ElNotification({
                         title:"添加数据失败",
                         message:"出现数据冲突",
@@ -417,7 +434,6 @@ const useEventTableStore = defineStore('eventtable',{
                         weekIndex:weekIndex,
                         index:index
                     })//这里直接push进去一个对象就不行!!!
-                    console.log(event.dataList);
                 }
             }
             event.summary.total = event.dataList.length //更新summary的数据
@@ -436,24 +452,22 @@ const useMapStore = defineStore('map',{
             mapy: 1195,
             points:Object,
             mapForm:{
-                location:-1,
+                location:'',
                 selected:false,
-                selecting:false,
-
-                eventSelected:false,//是否已经选好了
-                eventSelecting:false,//是否正在选择
-                endSelected:false,
-                endSelecting:false,
-                startSelected:false,
-                startSelecting:false,
-                
-                eventLocation:-1,
-                startLocation:-1,
-                endLocation:-1,
-                formshow:true
+                selectType:0
                 // 为什么添加selecting：根据selecting来判断，用户正在改event的地点，还是start，还是end，从而把location的值赋给相应的变量
                 // 为什么保留selected: {{ mapStore.mapForm.selected == false ? 要根据这个判断按钮文字显示什么
-            }
+            },
+            navigation:{
+                start: '',
+                end: '',
+                key: '',
+                locations: [],
+            },
+            showOption:Array,//显示的地点选项
+            OptionMap:Object,//地点选项的映射
+            showEvents:Array,//事件列表
+            selectLocations:Array,//地点列表
         }
     },
     actions:{
@@ -472,6 +486,48 @@ const useMapStore = defineStore('map',{
             })
             this.points = null
             this.points = temp
+        },
+        CreateOption(){//生成选项
+            if(this.navigation.key == ''){
+                var event = useEventTableStore()
+                if(event.dataList == null) console.log("dataList为空");
+                // 默认情况下,把当下所有的事件加入到里面
+                this.showOption = new Array()
+                for(let i = 0;i < event.dataList.length;i = i + 1){
+                    //依次加入
+                    let temp = event.weekData[event.dataList[i].weekIndex].list[event.dataList[i].index]
+                    if(temp.location != '' && temp.location != -1){
+                        this.showOption.push({
+                            title:temp.title,
+                            location:temp.location,
+                            locationName:this.points[temp.location-1].name
+                        })
+                    }
+                }
+            }else{
+                // 根据关键词搜索
+                this.showOption = new Array()
+                for(let i = 1;i <= this.points.length;i = i + 1){
+                    if(this.points[i-1].name.indexOf(this.navigation.key) != -1){
+                        this.showOption.push({
+                            title:'',
+                            location:i,
+                            locationName:this.points[i-1].name
+                        })
+                    }
+                }
+            }
+        },
+        ChoosePoint(item){
+            if(this.mapForm.selectType == 0){
+                this.mapForm.location = item.pid
+            }else if(this.mapForm.selectType == 1){
+                this.navigation.start = item.pid
+            }else if(this.mapForm.selectType == 2){
+                this.navigation.end = item.pid
+            }
+            this.mapForm.selected = true
+            this.show = false
         }
     }
 })
@@ -538,6 +594,19 @@ const useSearchStore = defineStore('search',{
     }    
 
 })
+// 冲突相关
+const useClashStore = defineStore('clash',{
+    state:()=>{
+        return{
+            clashFlag:false,
+            clashList:Object,//冲突的数据
+            clashShow:Object,//筛选后的数据
+        }
+    },
+    actions:{
+        
+    }
+})
 
 //css样式相关
 const useCssStore = defineStore('css',{
@@ -567,19 +636,7 @@ const useCssStore = defineStore('css',{
                 return this.PBDC[0]    
             }
         },
-        // GetOwnerBGC(typeID){
-        //     return this.OBGC[typeID%this.OWNER]
-        // },
-        // GetOwnerBDC(typeID){
-        //     return this.OBDC[typeID%this.OWNER]
-        // },
-        // //返回player样式,是偏黑深色
-        // GetPlayerBGC(){
-        //     return this.PBGC[0]
-        // },
-        // GetPlayerBDC(){
-        //     return this.PBDC[0]
-        // }
+
     }
 })
 
@@ -592,6 +649,7 @@ export{
     useHitokotoStore,
     useOperationStore,
     useSearchStore,
-    useCssStore
+    useCssStore,
+    useClashStore
 }
 

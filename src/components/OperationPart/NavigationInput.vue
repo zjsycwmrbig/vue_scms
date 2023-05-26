@@ -7,33 +7,83 @@
 
         <el-form :model="form" label-position="top">
             <el-form-item label="输入起点">
-                <el-col :span="8">
+                <div class="center">
                     <el-button
                         type="primary"
                         text
                         bg
-                        @click="mapStore.show=true,mapStore.mapForm.startSelecting=true,mapStore.mapForm.startSelected=false"
+                        @click="ChoosePoint(1)"
                         >
-                            {{ mapStore.mapForm.startSelected == false ?"选择起点":(mapStore.points[mapStore.mapForm.startLocation-1].name) }}
+                            {{ mapStore.navigation.start == '' ?"选择起点":(mapStore.points[mapStore.navigation.start-1].name) }}
                     </el-button>
-                </el-col>
+                </div>
             </el-form-item>
+            <el-form-item label="输入途径点">
+                <el-row gutter="10">
+                    <el-col :span="12">
+                        <el-select
+                          v-model="mapStore.navigation.locations"
+                          multiple
+                          placeholder="途经点"
+                          @change="change($event)"
+                        >
+                          <el-option
+                            v-for="(item,index) in mapStore.showOption"
+                            :key="index"
+                            :label="item.locationName"
+                            :value="item.locationName"
+                            
+                          />
+                        </el-select>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-input 
+                            v-model="mapStore.navigation.key"
+                            placeholder="添加途经点"
+                        
+                        ></el-input>
+                    </el-col>
+                    <el-col :span="4">
+                        <el-button @click="mapStore.CreateOption()">搜索</el-button>
+                    </el-col>
+                </el-row>
+            </el-form-item>
+            <el-form-item label="捎带事项">
+                <el-space >
+                    <el-tag
+                    type="primary"
+                    effect="dark"
+                    round
+                    v-for="(item,index) in mapStore.showEvents"
+                    :key="index"
+                    >
+                        {{ item }}
+                    </el-tag>
+                </el-space>
+                
+            </el-form-item>
+            
             <el-form-item label="输入终点">
-                <el-col :span="8">
+                <div class="center">
                     <el-button
-                        type="primary"
-                        text
-                        bg
-                        @click="mapStore.show=true,mapStore.mapForm.endSelecting=true,mapStore.endForm.endSelected=false"
-                        >
-                            {{ mapStore.mapForm.endSelected == false ?"选择终点":(mapStore.points[mapStore.mapForm.endLocation-1].name) }}
+                    type="primary"
+                    text
+                    bg
+                    @click="ChoosePoint(2)"
+                    >
+                        {{ mapStore.navigation.end == '' ?"选择终点":(mapStore.points[mapStore.navigation.end-1].name) }}
                     </el-button>
-                </el-col>
+                </div>
             </el-form-item>
+            <el-row justify="center">
+                <el-button size="large">查看最佳路线</el-button>
+            </el-row>
+            
         </el-form>
     </el-drawer>
 </template>
 <script>
+import { useEventTableStore } from '@/store/pinia'
 import { useOperationStore } from '@/store/pinia'
 import { useMapStore } from '@/store/pinia'
 
@@ -41,10 +91,39 @@ export default {
     setup() {
         let operationStore = useOperationStore()
         let mapStore = useMapStore()
-    
+        let eventStore = useEventTableStore()
+        let ChoosePoint = (type) => {
+            mapStore.show=true;
+            mapStore.mapForm.selected=false
+            mapStore.mapForm.selectType=type
+        }
+        let change = function(val){
+            mapStore.selectLocations = new Array()
+            mapStore.showEvents = new Array()
+            for (let point of mapStore.points){
+                for (let locationName of val){
+                    if(point.name == locationName){
+                        if(mapStore.selectLocations.indexOf(point.location) == -1) mapStore.selectLocations.push(point.pid)
+                    }
+                }
+            }
+
+            for (let index of eventStore.dataList){
+                let event = eventStore.weekData[index.weekIndex].list[index.index]
+                if(event.location != ''&&event.location != -1){
+                    for (let location of mapStore.selectLocations){
+                        if(location == event.location){
+                            mapStore.showEvents.push(event.title)
+                        }
+                    }
+                }
+            }
+        }
         return{
             operationStore,
-            mapStore
+            ChoosePoint,
+            mapStore,
+            change
         }
     },
 }
@@ -52,5 +131,8 @@ export default {
 <style scoped>
   .form{
     background-color: #fff;
+  }
+  .center{
+    margin: 0 auto;
   }
 </style>
