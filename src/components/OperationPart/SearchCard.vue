@@ -17,7 +17,7 @@
                     {{ (new Date(data.begin)).toLocaleDateString() }}
                 </div>
                 <div class="side loc">
-                    {{ data.location != -1?store.points[data.location].name:'地点未知' }}
+                    {{ data.location != -1?store.points[data.location-1].name:'地点未知' }}
                 </div>
             
                 <div class="side org">
