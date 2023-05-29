@@ -17,11 +17,14 @@
                     {{ (new Date(data.begin)).toLocaleDateString() }}
                 </div>
                 <div class="side loc">
-                    {{ data.location != -1?store.points[data.location-1].name:'地点未知' }}
+                    <div v-if="data.type != 2">
+                        {{ data.location != -1 && data.location != "" ?store.points[data.location-1].name:'地点未知' }}
+                    </div>
+                    
                 </div>
             
                 <div class="side org">
-                    {{ data.type == 0 ? "网名" : "组织名称" }}
+                    {{ data.group }}
                 </div>
 
             </el-space>

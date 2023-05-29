@@ -1,5 +1,19 @@
 const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
+  chainWebpack: config => {
+    config.module
+      .rule('worker-loader')
+      .test(/\.worker\.js$/)
+      .use({
+        loader: 'worker-loader',
+        options: {
+          inline: true,
+          workerType: 'module'
+        }
+      })
+      .loader('worker-loader')
+      .end()
+  },
   transpileDependencies: true,
   devServer: {
     //这里的ip和端口是前端项目的;下面为需要跨域访问后端项目

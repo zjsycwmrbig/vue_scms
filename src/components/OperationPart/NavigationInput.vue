@@ -76,8 +76,11 @@
                 </div>
             </el-form-item>
             <el-row justify="center">
-                <el-button size="large">查看最佳路线</el-button>
+                <el-button size="large" @click="mapStore.SubmitNavigation()">查看最佳路线</el-button>
             </el-row>
+
+            <!-- 导航展示 -->
+            <NavigationShow/>
             
         </el-form>
     </el-drawer>
@@ -86,8 +89,12 @@
 import { useEventTableStore } from '@/store/pinia'
 import { useOperationStore } from '@/store/pinia'
 import { useMapStore } from '@/store/pinia'
+import NavigationShow from './NavigationShow.vue'
 
 export default {
+    components:{
+        NavigationShow
+    },
     setup() {
         let operationStore = useOperationStore()
         let mapStore = useMapStore()

@@ -2,9 +2,9 @@
     <div class="head">
         <el-row align="middle" gutter="20" class="headrow"> 
             <!-- 按钮组 -->
-            <el-col :span="4">
+            <el-col :span="8">
                 <el-button-group>
-                    <el-button size="large" @click="asideStore.operationShow = !asideStore.operationShow">   
+                <el-button size="large" @click="asideStore.operationShow = !asideStore.operationShow">   
                     <el-icon>
                         <Operation />
                     </el-icon>
@@ -12,19 +12,26 @@
                 <el-button size="large" @click="asideStore.addShow = !asideStore.addShow">   
                     <el-icon><Promotion /></el-icon>
                 </el-button>
+                
                 <el-button size="large" @click="asideStore.searchShow = !asideStore.searchShow">   
                     <el-icon><Search /></el-icon>
                 </el-button>
+                <!-- 日志模块 -->
                 <el-button size="large" @click="asideStore.messageShow = !asideStore.messageShow">
-                    <el-icon><Promotion /></el-icon>
+                    <el-icon><Tickets /></el-icon>
                 </el-button>
+                <!-- 导航输入模块 -->
                 <el-button size="large" @click="asideStore.navigationShow = !asideStore.navigationShow">
-                    <el-icon><Promotion /></el-icon>
+                    <el-icon><LocationInformation /></el-icon>
+                </el-button>
+                <!-- 查找空闲时间 -->
+                <el-button size="large" @click="asideStore.freeTimeShow = !asideStore.freeTimeShow">
+                    <el-icon><Clock /></el-icon>
                 </el-button>
                 </el-button-group>
             </el-col>
             <!-- 中心标题 -->
-            <el-col :span="16">
+            <el-col :span="12">
                 <el-text class="title">{{ msg }}</el-text>
             </el-col>
             <!-- 头像 -->
@@ -34,9 +41,11 @@
             <!-- 注册搜索模块 -->
             <SearchPart/>
             <!-- 注册消息模块 -->
-            <MessageShow/>
+            <LogShow/>
             <!-- 注册导航输入模块 -->
             <NavigationInput/>
+            <!-- 注册查找空闲时间模块 -->
+            <FindFree/>
         </el-row>
     </div>
 </template>
@@ -46,16 +55,18 @@
 import { ref } from 'vue'
 import AvatarPart from './AvatarPart.vue'
 import SearchPart from '../OperationPart/SearchPart.vue'
-import MessageShow from '../OperationPart/MessageShow.vue'
+import LogShow from '../OperationPart/LogShow.vue'
 import NavigationInput from '../OperationPart/NavigationInput.vue'
 import { useOperationStore } from '@/store/pinia'
+import FindFree from '../OperationPart/FindFree.vue'
     export default {
         name:"UserHeader",
         components:{
             AvatarPart,
             SearchPart,
-            MessageShow,
-            NavigationInput
+            LogShow,
+            NavigationInput,
+            FindFree
         },
         setup(){
             let asideStore = useOperationStore()

@@ -2,7 +2,8 @@
     <!-- 头像外显 -->
     <div class="avatarpart" @mouseenter.capture="option.userCardShow = true" @mouseleave="option.userCardShow = false">
         <div class="avatar">
-            <img class="image" :src="user.userData.hasImage==false?'api/image/default.png':'api/image/'+user.userData.username+'.png'"/>
+            <!-- 头像是否存在 -->
+            <img class="image" :src="user.userData.hasImage==false?'api/image/default.jpg':'api/image/'+user.userData.username+'.jpg'"/>
         </div>
         <ShowCard/>
     </div>
