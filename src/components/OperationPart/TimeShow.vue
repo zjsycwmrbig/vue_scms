@@ -12,7 +12,7 @@
         <div class="speed" v-show="show">
             <div v-show="!pause">
                 <el-text>时间倍速</el-text>
-                <el-slider v-model="store.Timespeed" max="1000" show-input />
+                <el-slider v-model="store.Timespeed" max="1000" show-input @change="store.ChangeSpeed()"/>
                 <el-divider />
         </div>
 
@@ -27,7 +27,7 @@
                         <ArrowLeftBold />
                     </el-icon>
                 </el-button>
-                <el-button @click="PauseTime">
+                <el-button @click="ChangeDate(0)">
                     <el-icon size="20" color="#0000000">
                         <VideoPlay v-show="pause" />
                         <VideoPause v-show="!pause" />
@@ -55,9 +55,7 @@ import { useEventTableStore, useTimeStore } from '@/store/pinia';
 export default {
     setup() {
         let event = useEventTableStore()
-        const DAY = 1000 * 60 * 60 * 24;//一天的毫秒数
         let store = useTimeStore();
-        // store.BeginTime()
         const disabled = ref(false)
         const show = ref(false)
         //      切换卡片特效
@@ -88,9 +86,10 @@ export default {
         
         //      跳跃式改变日期
         function ChangeDate(det) {
-            let next = (store.GlobalTime.getDay()+6)%7+det
-            store.GlobalTime = new Date(store.GlobalTime.getTime() + DAY * det)
-            if(next < 0 || next > 6){
+            let next = (store.GlobalTime.getDay()+6) % 7 + det
+            store.ChangeTime(det) // 调用原有的
+            // store.GlobalTime = new Date(store.GlobalTime.getTime() + DAY * det)
+            if(det != 0 && (next < 0 || next > 6)){
                 // 跳跃式更新到下一周,更新数据,但是好像倒着跳没有更新
                 event.GetWeekData()
             }

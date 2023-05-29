@@ -48,6 +48,7 @@ export default {
     const loginStore = useLoginStore();
     // 开始时间
     const timeStore = useTimeStore()
+    
     timeStore.BeginTime()
     // 初始化时间
     return{

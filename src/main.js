@@ -2,6 +2,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 // import { store } from './store/index.js'
 // 全局引入
+
+
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 // 引入默认css样式
@@ -12,6 +14,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import "animate.css"
 const app = createApp(App)
 app.use(ElementPlus)
+// app.use(VueWorker)
 // app.use(store)
 // pinia
 import { createPinia } from 'pinia'

@@ -76,7 +76,7 @@
                 </div>
             </el-form-item>
             <el-row justify="center">
-                <el-button size="large">查看最佳路线</el-button>
+                <el-button size="large" @click="mapStore.SubmitNavigation()">查看最佳路线</el-button>
             </el-row>
             
         </el-form>

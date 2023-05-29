@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import { ElMessage, ElNotification } from "element-plus";
-
 //登录store
 const useLoginStore = defineStore('Login',{
     
@@ -187,26 +186,64 @@ const useTimeStore = defineStore('time',{
     state:()=>{
         return{
             GlobalTime:Date,
-            Timespeed:1,         //正常速率
-            ringTemp:false//标注是否该弹出通知
+            Timespeed:1,       
+            ringTemp:false,//标注是否该弹出通知
+            clockWebWorker:Worker,
         }
     },
     actions:{
         //开始计时
         BeginTime(){
-            let event = useEventTableStore()
+            let time = useTimeStore()
             // 开始时间并且定位进度
-            this.GlobalTime = new Date()
-            setInterval(() => {
-                this.GlobalTime = new Date(this.GlobalTime.getTime() + 250 * this.Timespeed)
-                if(this.GlobalTime.getDay() == 1){
-                    if(this.GlobalTime.getTime() < this.Timespeed * 250 * 3){
-                        event.GetWeekData() //更新数据
-                    }
+            time.GlobalTime = new Date();
+            this.clockWebWorker = new Worker('http://localhost:8080/clock.worker.js');
+            
+            this.clockWebWorker.postMessage("start")
+            
+            
+            
+            this.clockWebWorker.onmessage = function (event) {
+                if (event.data.getdata) {
+                    event.GetWeekData()
                 }
-                
-            }, 250)
+                time.GlobalTime = new Date(parseInt(event.data.time))
+            }
+
+            // let event = useEventTableStore()
+            // // 开始时间并且定位进度
+            // this.GlobalTime = new Date()
+            // setInterval(() => {
+            //     this.GlobalTime = new Date(this.GlobalTime.getTime() + 250 * this.Timespeed)
+            //     if(this.GlobalTime.getDay() == 1){
+            //         if(this.GlobalTime.getTime() < this.Timespeed * 250 * 3){
+            //             event.GetWeekData() //更新数据
+            //         }
+            //     }
+            // }, 250)
         },
+        ChangeSpeed(){
+            this.clockWebWorker.postMessage({
+                type: 0,
+                message: this.Timespeed
+            });
+        },
+        ChangeTime(timeSkip){
+            console.log(timeSkip);
+            if(timeSkip == 0){
+                // 暂停
+                this.clockWebWorker.postMessage({
+                    type: 2,
+                    message: 0
+                });
+            }else{
+                this.clockWebWorker.postMessage({
+                    type: 1,
+                    message: timeSkip
+                });
+            }
+        },
+
         //根据二分算法实现定位
         LocateItem(){
             let event = useEventTableStore()
@@ -450,14 +487,15 @@ const useMapStore = defineStore('map',{
             show:false,
             mapx: 996,
             mapy: 1195,
+            // 点数据
             points:Object,
+            // 地图表单相关
             mapForm:{
                 location:'',
                 selected:false,
                 selectType:0
-                // 为什么添加selecting：根据selecting来判断，用户正在改event的地点，还是start，还是end，从而把location的值赋给相应的变量
-                // 为什么保留selected: {{ mapStore.mapForm.selected == false ? 要根据这个判断按钮文字显示什么
             },
+            // 导航信息
             navigation:{
                 start: '',
                 end: '',
@@ -468,9 +506,11 @@ const useMapStore = defineStore('map',{
             OptionMap:Object,//地点选项的映射
             showEvents:Array,//事件列表
             selectLocations:Array,//地点列表
+            navigationList:Array,//导航列表
         }
     },
     actions:{
+        // 获取地图数据
         async GetPoints(){
             let temp;
             await axios.get("/api/static/Points.json",{
@@ -487,7 +527,9 @@ const useMapStore = defineStore('map',{
             this.points = null
             this.points = temp
         },
-        CreateOption(){//生成选项
+        // 获取地点列表
+        CreateOption(){
+            //生成选项 , 这里在临时事件改变后需要做调整
             if(this.navigation.key == ''){
                 var event = useEventTableStore()
                 if(event.dataList == null) console.log("dataList为空");
@@ -518,6 +560,7 @@ const useMapStore = defineStore('map',{
                 }
             }
         },
+        // 获取地点列表
         ChoosePoint(item){
             if(this.mapForm.selectType == 0){
                 this.mapForm.location = item.pid
@@ -528,6 +571,26 @@ const useMapStore = defineStore('map',{
             }
             this.mapForm.selected = true
             this.show = false
+        },
+        // 提交导航信息
+        async SubmitNavigation(){
+            let store = useMapStore()
+            await axios.post("/api/navigate/Targets",{
+                start:store.navigation.start,
+                end:store.navigation.end,
+                locations:store.navigation.locations
+            }).then(function(respose){
+                if(respose.status == 200){
+                    store.navigationList = respose.data
+                }else{
+                    ElNotification({
+                        title:"提交导航信息失败",
+                        message:"服务器出现错误",
+                        type:"error"
+                    })
+                }
+            })
+            
         }
     }
 })
@@ -564,9 +627,46 @@ const useOperationStore = defineStore('aside',{
             userCardShow :false,
             userCenterShow:false,
             messageShow:false,
-            navigationShow:false
+            navigationShow:false,
+            freeTimeShow:false,
         }
     },
+    actions:{
+        
+    }
+})
+
+// 空闲时间相关
+const useFindFreeTimeStore = defineStore('freeTime',{
+    state:()=>{
+        return{
+            // 空闲时间集合,从后端获取
+            freeTime:Object
+        }
+    },
+    actions:{
+        async FindFreeTime(key,mode){
+            let data = useFindFreeTimeStore()
+            if(mode == null) mode = 0
+            await axios.get("/api/query/freeTime",{
+                params:{
+                    key:key,
+                    mode:mode
+                }
+            }).then(function(respose){
+                if(respose.status == 200){
+                    // 正常返回
+                    data.freeTime = respose.data
+                }else{
+                    ElNotification({
+                        title: '查找空闲时间错误',
+                        message: '请求异常',
+                        type: 'error'
+                    })
+                }
+            })
+        }
+    }
 })
 
 //搜索相关
@@ -640,6 +740,50 @@ const useCssStore = defineStore('css',{
     }
 })
 
+//日志相关
+const useLogStore = defineStore('log',{
+    state:()=>{
+        return{
+            logs: [],
+                // 总数
+            total: 100,   
+        }
+        
+    },
+    actions:{
+        async GetLog(form){
+
+            // 给定当前页和每页的大小
+            await axios.get("/api/log/get",{
+                params:{
+                    currentPage:form.currentPage,
+                    pageSize:form.pageSize
+                }
+            }).then(function(respose){
+                if(respose.status == 200){
+                    if(respose.data.res == true){
+                        let store = useLogStore()
+                        store.logs = respose.data.logs;
+                        store.total = respose.data.total;
+                    }else{
+                        ElNotification({
+                            title: '获取日志错误',
+                            message: '服务器异常',
+                            type: 'error',
+                        })
+                    }
+                }else{
+                    ElNotification({
+                        title: '获取日志错误',
+                        message: '服务器异常',
+                        type: 'error'
+                    })
+                }
+
+            })
+        }
+    }
+})
 
 export{
     useLoginStore,
@@ -650,6 +794,8 @@ export{
     useOperationStore,
     useSearchStore,
     useCssStore,
-    useClashStore
+    useClashStore,
+    useFindFreeTimeStore,
+    useLogStore
 }
 
