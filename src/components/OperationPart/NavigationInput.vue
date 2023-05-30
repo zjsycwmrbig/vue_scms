@@ -76,7 +76,7 @@
                 </div>
             </el-form-item>
             <el-row justify="center">
-                <el-button size="large" @click="mapStore.SubmitNavigation()">查看最佳路线</el-button>
+                <el-button size="large" @click="bestWay()">查看最佳路线</el-button>
             </el-row>
 
             <!-- 导航展示 -->
@@ -104,6 +104,10 @@ export default {
             mapStore.mapForm.selected=false
             mapStore.mapForm.selectType=type
         }
+        function bestWay(){
+            mapStore.SubmitNavigation()
+            // mapStore.generateInterpolatedPoints()//生成插值点
+        }
         let change = function(val){
             mapStore.selectLocations = new Array()
             mapStore.showEvents = new Array()
@@ -130,7 +134,8 @@ export default {
             operationStore,
             ChoosePoint,
             mapStore,
-            change
+            change,
+            bestWay
         }
     },
 }

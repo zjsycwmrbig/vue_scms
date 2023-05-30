@@ -517,6 +517,7 @@ const useMapStore = defineStore('map',{
             showEvents:Array,//事件列表
             selectLocations:Array,//地点列表
             navigationList:Array,//导航列表
+            interpolatedPoints:Array
         }
     },
     actions:{
@@ -582,6 +583,29 @@ const useMapStore = defineStore('map',{
             this.mapForm.selected = true
             this.show = false
         },
+        generateInterpolatedPoints(){
+            let store = useMapStore()
+            const segments = store.navigationList.length - 1
+            for (let i = 0; i < segments; i++) {
+                const start = store.navigationList[i];//start end 为pid
+                const end = store.navigationList[i+1];
+                const numInterpolatedPoints = 10; // 插值点的数量
+                for (let j = 1; j <= numInterpolatedPoints; j++) {
+                    const x = store.points[start-1].x + (store.points[end-1].x-store.points[start-1].x)*(j / numInterpolatedPoints);
+                    // const x = start.x + (end.x - start.x) * (j / numInterpolatedPoints);
+                    const y = store.points[start-1].y + (store.points[end-1].y-store.points[start-1].y)*(j / numInterpolatedPoints);
+                    // const y = start.y + (end.y - start.y) * (j / numInterpolatedPoints);
+                    store.interpolatedPoints.push({ x, y });
+                }
+            }
+            console.log("导航路线是：")
+            console.log(store.navigationList)
+            console.log("插值数组是：")
+            console.log(store.interpolatedPoints) // 在控制台输出插值点数组
+            console.log("祝杰最帅")
+            console.log(typeof store.interpolatedPoints)
+            
+        },
         // 提交导航信息
         async SubmitNavigation(){
             let store = useMapStore()
@@ -592,6 +616,7 @@ const useMapStore = defineStore('map',{
             }).then(function(respose){
                 if(respose.status == 200){
                     store.navigationList = respose.data
+                    store.generateInterpolatedPoints()
                     store.navigationShow = true
                 }else{
                     ElNotification({
