@@ -499,6 +499,7 @@ const useMapStore = defineStore('map',{
         return{
             // 这里根据图片原有尺寸和现在的视口比例确定定位信息
             show:false,
+            navigationShow:false,
             mapx: 996,
             mapy: 1195,
             // 点数据
@@ -596,6 +597,7 @@ const useMapStore = defineStore('map',{
             }).then(function(respose){
                 if(respose.status == 200){
                     store.navigationList = respose.data
+                    store.navigationShow = true
                 }else{
                     ElNotification({
                         title:"提交导航信息失败",
