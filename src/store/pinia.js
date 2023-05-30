@@ -117,12 +117,19 @@ const useLoginStore = defineStore('Login',{
         async ChangeItem(name,itemname){    
             await axios.get('api/user/change_'+itemname,{
                 params:{
-                    netname:name
+                    "itemname":name
                 }
             }).then(function(respose){
                 if(respose.status == 200){
                     if(respose.data.res == true){
                         ElMessage.success("修改成功");
+                        let user = useLoginStore()
+                        if(itemname == 'name'){
+                            user.userData.netname = name
+                        }else if(itemname == 'word'){
+                            user.userData.PersonalWord = name
+                        }
+                        user.userData.netname = name
                     }else{
                         ElMessage.error("修改失败");
                     }
@@ -437,9 +444,13 @@ const useEventTableStore = defineStore('eventtable',{
         },
         //删除条目
         DeleteItem(item){
-            axios.delete('/api/add/item',{
-                type:item.type,
-                begin:item.begin
+            //删除条目 , 但是要判断是否有权限删除
+            let event = useEventTableStore()
+            axios.get('/api/delete/item',{
+                params:{
+                    indexID:item.indexID,
+                    begin:item.begin
+                }
             }).then(function(respose){
                 if(respose.data.res == true){
                     ElNotification({
@@ -449,6 +460,8 @@ const useEventTableStore = defineStore('eventtable',{
                         position:"bottom-right"
                     })
                     event.GetWeekData()//获取新信息
+                    // 更新其他数据
+
                 }else{
                     ElNotification({
                         title:"删除数据失败",
@@ -456,6 +469,7 @@ const useEventTableStore = defineStore('eventtable',{
                         type:"error",
                         position:"bottom-right"
                     })
+                    
                 }
             })
         },
@@ -668,22 +682,49 @@ const useFindFreeTimeStore = defineStore('freeTime',{
     state:()=>{
         return{
             // 空闲时间集合,从后端获取
-            freeTime:Object
+            freeTime:Object,
+            form:{
+                key:"",
+                mode:"",
+                date:"",
+                length:""
+            }
         }
     },
     actions:{
-        async FindFreeTime(key,mode){
+        async FindFreeTime(){
             let data = useFindFreeTimeStore()
-            if(mode == null) mode = 0
-            await axios.get("/api/query/freeTime",{
+            let form = data.form
+            let mode = "user"
+            switch(form.mode){
+                case 0:
+                    // 用户空闲时间
+                    mode = "user"
+                    break;
+                case 1:
+                    // 组织空闲时间
+                    mode = "org"
+                    break;
+            }
+            console.log(form);
+            await axios.get(`/api/query/${mode}_free_time`,{
                 params:{
-                    key:key,
-                    mode:mode
+                    key:form.key,
+                    date:new Date(form.date).getTime(),
+                    length:form.length,
                 }
             }).then(function(respose){
                 if(respose.status == 200){
                     // 正常返回
-                    data.freeTime = respose.data
+                    if(respose.data.res == true){
+                        data.freeTime = respose.data
+                    }else{
+                        ElNotification({
+                            title: '查找空闲时间错误',
+                            message: respose.data.state,
+                            type: 'error'
+                        })
+                    }
                 }else{
                     ElNotification({
                         title: '查找空闲时间错误',

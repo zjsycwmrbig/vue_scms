@@ -21,7 +21,7 @@
                   :on-success="handleAvatarSuccess"
                   :before-upload="beforeAvatarUpload"
                 >
-                  <img :src="user.userData.hasImage==false?'api/image/default.png':'api/image/'+user.userData.username+'.png'" class="avatar"/>
+                  <img :src="user.userData.hasImage==false?'api/image/default.jpg':'api/image/'+user.userData.username+'.jpg'" class="avatar"/>
                 </el-upload>
                 
                 <div class="info">
@@ -47,7 +47,7 @@
                             </el-button>
                         </template>
                     </el-input>
-                    <el-text @click="form.editname = true" v-else>{{ user.userData.owner[0] }}</el-text>
+                    <el-text @click="form.editname = true" v-else>{{ user.userData.netname == null ? "小茗同学": user.userData.netname }}</el-text>
                 </el-card>
 
                 <el-card class="item">

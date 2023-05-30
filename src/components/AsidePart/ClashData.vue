@@ -10,7 +10,7 @@
             </div>
         </el-col>
         <!-- 右侧部分 -->
-        <el-col :span="15">
+        <el-col :span="18">
             <el-space alignment="vertical" fill="true" class="sidebox">
                 
                 <div class="side time">
@@ -22,19 +22,6 @@
             
                 <div class="side org">
                     {{ data.group }}
-                </div>
-
-            </el-space>
-        </el-col>
-        <el-col :span="3">
-            <el-space alignment="vertical" fill="true" class="sidebox">
-                
-                <div class="side time">
-                    冲突指数
-                </div>
-
-                <div>
-                    {{ data.clashDeg }}
                 </div>
 
             </el-space>
@@ -56,12 +43,14 @@
 </script>
 
 <style scoped>
-    .clashcard{
-        width: 100%;
-        height: 100%;
-        background-color: #fff5eb;
+    .clashcard {
+        width: 95%;
+        background-color: #fde3c7;
+        padding: 5px;
         border-radius: 3px;
+        margin: 3px auto;
     }
+    
     .title{
         height: 10.5vh;
         width: 100%;
@@ -73,6 +62,7 @@
         display: flex;
         /* 增加标题应有的样式 */
     }
+    
     h4{
         margin: auto;
     }
@@ -82,14 +72,14 @@
         width: 100%;
         text-align: center;
         line-height: 3vh;
-        
-        
         /* 增加侧边应有的样式 */
         background-color: #ffffcc;
         border: 1px solid #fde3c7;
         border-radius: 0.5vw;
     }
+
     .sidebox{
         width: 100%;
     }
+
 </style>
