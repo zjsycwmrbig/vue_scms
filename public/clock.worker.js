@@ -1,6 +1,13 @@
 var SCMStime = new Date();
 var SCMSspeed = 1; // 时间加速倍率,默认是1
 var SCMSpause = false
+var ClockPost = function(time, getdata){
+  self.postMessage({
+    time: new Date(time).getTime(),
+    getdata:getdata
+  });
+}
+
 
 function tick() {
   if(SCMSpause == false){
@@ -9,16 +16,11 @@ function tick() {
       
       let startSCMStime = new Date(SCMStime.getFullYear(),SCMStime.getMonth(),SCMStime.getDate(),0,0,0);
       if(SCMStime.getTime() - startSCMStime.getTime() < 300){
-          this.postMessage({
-            time: SCMStime.getTime(),
-            getdata:true
-          });      
+        ClockPost(SCMStime,true);
         }
       }else{
-        this.postMessage({
-          time: SCMStime.getTime(),
-          getdata:false
-        });
+        
+        ClockPost(SCMStime,false);
       }
   }
 
@@ -39,17 +41,12 @@ onmessage = function(message) {
         case 1:
             // 跳跃,直接修改时间
             SCMStime = new Date(new Date(SCMStime).getTime() + parseInt(getMessage.message) * 24 * 60 * 60 * 1000);
-            this.postMessage({
-              time: SCMStime.getTime(),
-              getdata:false
-            })
+            
+            ClockPost(SCMStime,false);
             break;
         case 2:
-            // 暂停
-            this.postMessage({
-              time: SCMStime.getTime(),
-              getdata:false
-            })
+            
+            ClockPost(SCMStime,false);
             SCMSpause = !SCMSpause;
             break;
       }

@@ -58,7 +58,6 @@
 
 <script>
 import { useClashStore } from '@/store/pinia'
-// import ClashItem from './ClashItem.vue'
 import ClashData from './ClashData.vue'
     export default {
       components: {

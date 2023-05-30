@@ -187,7 +187,6 @@ const useLoginStore = defineStore('Login',{
         }
     }
 })
-
 //时间
 const useTimeStore = defineStore('time',{
     state:()=>{
@@ -207,9 +206,6 @@ const useTimeStore = defineStore('time',{
             this.clockWebWorker = new Worker('http://localhost:8080/clock.worker.js');
             
             this.clockWebWorker.postMessage("start")
-            
-            
-            
             this.clockWebWorker.onmessage = function (event) {
                 if (event.data.getdata) {
                     event.GetWeekData()
@@ -263,7 +259,7 @@ const useTimeStore = defineStore('time',{
                 let right = event.dataList.length - 1;
                 let index = -1;
                 let value = this.GlobalTime.getTime()
-                
+
                 // 二分查找 value 的位置
                 while (left <= right) {
                   let mid = Math.floor((left + right) / 2);
@@ -283,8 +279,8 @@ const useTimeStore = defineStore('time',{
                 if (index === -1) {
                   index = left;
                 }
-                // 从该位置开始向后遍历数组，找到第一个大于 value 的元素
                 
+                // 从该位置开始向后遍历数组，找到第一个大于 value 的元素
                 while (index < event.dataList.length && event.weekData[event.dataList[index].weekIndex].list[event.dataList[index].index].begin + event.weekData[event.dataList[index].weekIndex].list[event.dataList[index].index].length <= value) {
                   index++;
                 }
@@ -343,7 +339,6 @@ const useTimeStore = defineStore('time',{
         },
     }
 })
-
 //事件表
 const useEventTableStore = defineStore('eventtable',{
     state:()=>{
@@ -394,6 +389,7 @@ const useEventTableStore = defineStore('eventtable',{
                 event.weekData = respose.data.routines;//数组,包含index和数据
                 event.BuildDataList(respose.data.routines) //构建
                 event.show = true;
+                // 构建LocateItem
             })
         },
         // 添加事项数据
@@ -418,7 +414,8 @@ const useEventTableStore = defineStore('eventtable',{
                 begin:datebegin,
                 end:form.end==''? (datebegin +form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000):(form.end.getTime()),
                 length:form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000,
-                locationData:form.locationData
+                locationData:form.locationData,
+                size:0
             }).then(function(respose){
                 if(respose.data.res == true){
                     ElNotification({
@@ -469,7 +466,7 @@ const useEventTableStore = defineStore('eventtable',{
                         type:"error",
                         position:"bottom-right"
                     })
-                    
+
                 }
             })
         },
@@ -491,8 +488,6 @@ const useEventTableStore = defineStore('eventtable',{
         }
 }
 })
-
-
 //地图
 const useMapStore = defineStore('map',{
     state:()=>{
@@ -607,10 +602,24 @@ const useMapStore = defineStore('map',{
                 }
             })
             
+        },
+        // 格式化地点信息
+        FormatLocation(location,type){
+            if(type == 2){
+                // 临时事件
+                let locations = location.split('|')
+                console.log(locations);
+                for(let i = 0;i < locations.length;i = i + 1) {
+                    locations[i] = this.points[locations[i]-1].name
+                }
+                return locations
+            }else{
+                // 普通时间
+                return this.points[location-1].name
+            }
         }
     }
 })
-
 //每日一句
 const useHitokotoStore = defineStore('hito',{
     state:()=>{
@@ -632,7 +641,6 @@ const useHitokotoStore = defineStore('hito',{
         }
     }
 })
-
 // 关于抽屉等的开关
 const useOperationStore = defineStore('aside',{
     state:()=>{
@@ -651,7 +659,6 @@ const useOperationStore = defineStore('aside',{
         
     }
 })
-
 // 空闲时间相关
 const useFindFreeTimeStore = defineStore('freeTime',{
     state:()=>{
@@ -671,12 +678,13 @@ const useFindFreeTimeStore = defineStore('freeTime',{
             let data = useFindFreeTimeStore()
             let form = data.form
             let mode = "user"
+            console.log(form);
             switch(form.mode){
-                case 0:
+                case '0':
                     // 用户空闲时间
                     mode = "user"
                     break;
-                case 1:
+                case '1':
                     // 组织空闲时间
                     mode = "org"
                     break;
@@ -692,7 +700,7 @@ const useFindFreeTimeStore = defineStore('freeTime',{
                 if(respose.status == 200){
                     // 正常返回
                     if(respose.data.res == true){
-                        data.freeTime = respose.data
+                        data.freeTime = respose.data.data
                     }else{
                         ElNotification({
                             title: '查找空闲时间错误',
@@ -711,12 +719,12 @@ const useFindFreeTimeStore = defineStore('freeTime',{
         }
     }
 })
-
 //搜索相关
 const useSearchStore = defineStore('search',{
     state:()=>{
         return{
-            searchRes:Object
+            searchRes:Object,
+            searchData:Object,
         }
     },
     actions:{
@@ -729,8 +737,54 @@ const useSearchStore = defineStore('search',{
                 }
             }).then(function(respose){
                 if(respose.status == 200){
-                    store.searchRes = respose.data
-                    console.log(store.searchRes);
+                    store.searchData = respose.data.data
+                    let func = useFuncStore()
+                    // let points = useMapStore()
+                    // 处理searchRes来适应表格的显示
+                    // if(new )
+                    
+                    // for(let i = 0;i < store.searchData.length;i = i + 1){
+                    //     // 格式化
+                    //     store.searchData[i].begin = func.FormatTime(store.searchData[i].begin)
+                    //     store.searchData[i].length = func.FormatTimeLength(store.searchData[i].length)
+                    //     let location = points.FormatLocation(store.searchData[i].location,store.searchData[i].type)
+                    //     if(Array.isArray(location)){
+                    //         // 临时事件
+                    //         store.searchData[i].location = location.join('|')
+                    //     }else{
+                    //         store.searchData[i].location = location
+                    //     }
+                    // }
+
+                    store.searchRes = func.FormatEventListData(store.searchData)
+                    
+                }else{
+                    ElNotification({
+                        title: '搜索错误',
+                        message: '请求异常',
+                        type: 'error'
+                    })
+                }
+            })
+        },
+        async Between(begin,end){
+            let store = useSearchStore()
+            await axios.get("/api/query/between",{
+                params:{
+                    begin:new Date(begin).getTime(),
+                    end:new Date(end).getTime()
+                }
+            }).then(function(respose){
+                if(respose.status == 200){
+                    store.searchData = respose.data.data
+                    let func = useFuncStore()
+                    store.searchRes = func.FormatEventListData(store.searchData)
+                }else{
+                    ElNotification({
+                        title: '搜索错误',
+                        message: '请求异常',
+                        type: 'error'
+                    })
                 }
             })
         }
@@ -750,7 +804,6 @@ const useClashStore = defineStore('clash',{
         
     }
 })
-
 //css样式相关
 const useCssStore = defineStore('css',{
     state:()=>{
@@ -782,7 +835,6 @@ const useCssStore = defineStore('css',{
 
     }
 })
-
 //日志相关
 const useLogStore = defineStore('log',{
     state:()=>{
@@ -827,6 +879,53 @@ const useLogStore = defineStore('log',{
         }
     }
 })
+//工具类
+const useFuncStore = defineStore('func',{
+    state:()=>{
+        return{
+
+        }
+    },
+    actions:{
+        // 时间格式化
+        FormatTime(time){
+            const date = new Date(time);
+            const formattedDateTime = date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0') + ' ' + date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0') + ':' + date.getSeconds().toString().padStart(2, '0');
+            return formattedDateTime;
+        },
+        // 长度格式化
+        FormatTimeLength(length){
+            // 小时和分钟
+            let hour = Math.floor(length/(60*60*1000))
+            let minute = Math.floor((length/(60*1000))%60)
+
+            return `${hour}小时${minute}分钟`
+        },
+        FormatEventListData(List){
+            // 传送过来List
+            if(!Array.isArray(List)){
+                return null
+            }else{
+                let points = useMapStore()
+                for(let i = 0;i < List.length;i = i + 1){
+                    // 格式化
+                    List[i].begin = this.FormatTime(List[i].begin)
+                    List[i].length = this.FormatTimeLength(List[i].length)
+                    let location = points.FormatLocation(List[i].location,List[i].type)
+                    if(Array.isArray(location)){
+                        // 临时事件
+                        List[i].location = location.join('|')
+                    }else{
+                        List[i].location = location
+                    }
+                }
+            }
+            return List
+        }        
+
+    }
+})
+
 
 export{
     useLoginStore,
@@ -839,6 +938,7 @@ export{
     useCssStore,
     useClashStore,
     useFindFreeTimeStore,
-    useLogStore
+    useLogStore,
+    useFuncStore
 }
 

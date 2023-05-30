@@ -147,7 +147,7 @@ export default {
             if(state.loginstate == 1){
             time.LocateItem()//更新store中的数据
         }
-        },17)
+        },100)
         return {
             store,
             map,

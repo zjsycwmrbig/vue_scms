@@ -5,6 +5,7 @@
         title="空闲时间"
         :show-close="true"
         class="form">
+
         <div class="searchpart">
             <div class="searchoption">
                 <div class="date">
@@ -57,12 +58,17 @@
             
             
         </div>
-        
+        <!-- 显示模块 -->
+        <div class="showpart">
+            <div class="timebox" v-for="(item,index) in freeTimeStore.freeTime" :key="index">
+                {{ func.FormatTime(item.begin) }} - {{ func.FormatTime(item.end) }}
+            </div>
+        </div>
     </el-drawer>
 </template>
 
 <script>
-import { useOperationStore, useTimeStore } from '@/store/pinia'
+import { useFuncStore, useOperationStore, useTimeStore } from '@/store/pinia'
 import {useFindFreeTimeStore} from '@/store/pinia'
 import {reactive} from 'vue'
 export default {
@@ -70,6 +76,7 @@ export default {
         let option = useOperationStore()
         let freeTimeStore = useFindFreeTimeStore()
         let time = useTimeStore()
+        let func = useFuncStore()
         // 查询空闲时间表单
         let form = reactive({
             key:"",
@@ -77,12 +84,14 @@ export default {
             date:"",
             length:""
         })
-        
-        return{
+
+        return {
+            // DataFormat,
             option,
             freeTimeStore,
             form,
-            time
+            time,
+            func
         }
     }
 }
@@ -105,5 +114,14 @@ export default {
         color: #272b32;
         line-height: 100%;
         margin: auto 0;
+    }
+    .timebox{
+        color: #43a3f7;
+        font-size: 2rem;
+        padding: 5px;
+        margin: 5px 0;
+        border-radius:5px ;
+        background-color:#fff5eb;
+        border: 2px solid #fee6cb;
     }
 </style>
