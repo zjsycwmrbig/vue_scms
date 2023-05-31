@@ -1,17 +1,25 @@
 <template>
     <el-drawer
         v-model="store.navigationShow"
-        title="导航"
-        :show-close="false"
+        title="导航展示"
+        :show-close="true"
         class="navigationShow"
         :size="'45%'"
     >
         <div class="map">
-            <div v-for="item in store.interpolatedPoints" :key="item.index">
-                <template>
-                    <div class="realpoint" :style="LocatePoint(item)"></div>
-                </template>
-            </div>
+
+            <transition-group 
+                name="group-anime"
+                enter-active-class="animate__animated"
+                leave-active-class="animate__animated"
+            >
+                <div v-for="(item,index) in store.navigationShowList" :key="index">
+                    <div class="point" :style="LocatePoint(item)" >
+                        <el-icon size="large"><Star /></el-icon>
+                    </div>
+                </div>    
+            </transition-group>
+            
             <img src="/api/static/map.png" alt="">
         </div>
     </el-drawer>
@@ -45,21 +53,26 @@ export default {
     
 }
 </script>
-<style>
-.realpoint{
+<style scoped>
+
+.point{
     /* 点的大小也写死了 */
     position: absolute;
-    display: block;
     border-radius: 50%;
     height: 0.5vw;
     width: 0.5vw;
-    background-color: #000;
+    color: #43a3f7;
 }
 
+
 .map{
-    /* 为了速度写死了呀 */
-    /* 宽度是40,高度是 */
     position: relative;
     width: 40vw;
+    margin: 0 auto;
+}
+.map img{
+    width: 100%;
+    height: 100%;
+    
 }
 </style>

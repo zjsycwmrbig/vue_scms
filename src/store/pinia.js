@@ -518,6 +518,7 @@ const useMapStore = defineStore('map',{
             showEvents:Array,//事件列表
             selectLocations:Array,//地点列表
             navigationList:Array,//导航列表
+            navigationShowList:Array,//导航显示列表
             interpolatedPoints:Array
         }
     },
@@ -586,26 +587,26 @@ const useMapStore = defineStore('map',{
         },
         generateInterpolatedPoints(){
             let store = useMapStore()
+            store.interpolatedPoints = new Array()
             const segments = store.navigationList.length - 1
             for (let i = 0; i < segments; i++) {
                 const start = store.navigationList[i];//start end 为pid
                 const end = store.navigationList[i+1];
                 const numInterpolatedPoints = 10; // 插值点的数量
                 for (let j = 1; j <= numInterpolatedPoints; j++) {
-                    const x = store.points[start-1].x + (store.points[end-1].x-store.points[start-1].x)*(j / numInterpolatedPoints);
-                    // const x = start.x + (end.x - start.x) * (j / numInterpolatedPoints);
-                    const y = store.points[start-1].y + (store.points[end-1].y-store.points[start-1].y)*(j / numInterpolatedPoints);
-                    // const y = start.y + (end.y - start.y) * (j / numInterpolatedPoints);
-                    store.interpolatedPoints.push({ x, y });
+                    let x = (store.points[start-1].x + (store.points[end-1].x-store.points[start-1].x)*(j / numInterpolatedPoints));
+                    let y = (store.points[start-1].y + (store.points[end-1].y-store.points[start-1].y)*(j / numInterpolatedPoints));
+                    let item = {
+                        x: parseFloat(x.toFixed(2)),
+                        y: parseFloat(y.toFixed(2))
+                    }
+                    store.interpolatedPoints.push(item);
                 }
             }
-            console.log("导航路线是：")
-            console.log(store.navigationList)
-            console.log("插值数组是：")
-            console.log(store.interpolatedPoints) // 在控制台输出插值点数组
-            console.log("祝杰最帅")
-            console.log(typeof store.interpolatedPoints)
-            
+            // console.log("导航路线是：")
+            // console.log(store.navigationList)
+            // console.log("插值数组是：")
+            // console.log(store.interpolatedPoints) // 在控制台输出插值点数组
         },
         // 提交导航信息
         async SubmitNavigation(){
@@ -616,9 +617,20 @@ const useMapStore = defineStore('map',{
                 locations:store.navigation.locations
             }).then(function(respose){
                 if(respose.status == 200){
-                    store.navigationList = respose.data
-                    store.generateInterpolatedPoints()
-                    store.navigationShow = true
+                    if(respose.data.res == true){
+                        store.navigationList = respose.data.data
+                        store.generateInterpolatedPoints()
+                        store.navigationShow = true
+                        store.NavigationShow()
+                    }else{
+                        ElNotification({
+                            title:"导航出错",
+                            message:respose.data.state,
+                            type:"error"
+                        })
+                    }
+                    
+                    // 返回
                 }else{
                     ElNotification({
                         title:"提交导航信息失败",
@@ -643,6 +655,37 @@ const useMapStore = defineStore('map',{
                 // 普通时间
                 return this.points[location-1].name
             }
+        },
+        // 依次步入导航
+        NavigationShow(){
+            let store = useMapStore()
+            // 初始化
+            store.navigationShowList = new Array()
+            let index = 0
+            
+            // 对导航内容进行阶段性更新
+            let fadeTab = function(index){
+                if(index < 5){
+                    // 前五个是不需要移除的
+                    store.navigationShowList.push(store.interpolatedPoints[index])
+                }else if(index >= store.interpolatedPoints.length){
+                    store.navigationShowList.shift()
+                }else{
+                    store.navigationShowList.shift()
+                    store.navigationShowList.push(store.interpolatedPoints[index])
+                }
+
+                if(index < store.interpolatedPoints.length + 5){
+                    setTimeout(fadeTab,100,index+1)
+                }
+            }
+
+            setTimeout(fadeTab,100,index);
+            
+            // 依次步入
+            
+            
+
         }
     }
 })
