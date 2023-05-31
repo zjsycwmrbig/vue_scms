@@ -103,7 +103,10 @@ import { ref,computed } from 'vue'
             const handleDelete = (row) => {
                 let item = row
                 item.begin = new Date(item.begin).getTime()
-                event.DeleteItem(item
+                if(event.DeleteItem(item)){
+                    // 删除指定的数据
+                    search.searchRes.splice(search.searchRes.indexOf(row),1)
+                }
                 // 记得删除数据
             }
 

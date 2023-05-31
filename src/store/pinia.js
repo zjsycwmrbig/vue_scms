@@ -458,7 +458,7 @@ const useEventTableStore = defineStore('eventtable',{
                     })
                     event.GetWeekData()//获取新信息
                     // 更新其他数据
-
+                    return true
                 }else{
                     ElNotification({
                         title:"删除数据失败",
@@ -468,6 +468,7 @@ const useEventTableStore = defineStore('eventtable',{
                     })
 
                 }
+                return false
             })
         },
         //构建线性索引
