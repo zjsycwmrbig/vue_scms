@@ -55,13 +55,26 @@
         </div>
     </div>
     <el-divider>查询结果</el-divider>
-    <el-table v-if="Array.isArray(search.searchRes)" :data="search.searchRes" height="700" style="width: 100%">
+    <el-table v-if="Array.isArray(search.searchRes)" :data="filterData" height="700" style="width: 100%">
         <el-table-column prop="title" label="标题"  />
         <el-table-column prop="group" label="组织"  />
         <el-table-column prop="begin" label="事项开始时间"  />
         <el-table-column prop="length" label="事项持续时间"  />
         <el-table-column prop="location" label="地点"  />
         <el-table-column prop="locationData" label="地点备注" />
+        <el-table-column align="right">
+      <template #header>
+        <el-input v-model="searchvaule" size="small" placeholder="Type to search" />
+      </template>
+      <template #default="scope">
+        <el-button
+          type="danger"
+          @click="handleDelete(scope.row)"
+          >
+          删除
+          </el-button>
+      </template>
+    </el-table-column>
     </el-table>
     <el-empty v-else :image-size="500" />
     
@@ -69,19 +82,30 @@
 </template>
 
 <script>
-import { useOperationStore,useSearchStore } from '@/store/pinia'
+import { useEventTableStore, useOperationStore,useSearchStore } from '@/store/pinia'
 import { reactive } from 'vue'
-
-// import SearchCard from './SearchCard.vue'
+import { ref,computed } from 'vue'
     export default {
         components:{
-            // SearchCard
+            
         },
         setup(){
             let search = useSearchStore()
             let store = useOperationStore()
+            let event = useEventTableStore()
             //表单数据
+            const searchvaule = ref('')
             
+            const filterData = computed(() =>
+               search.searchRes.filter((data) => !searchvaule.value || data.title.includes(searchvaule.value))
+            )
+
+            const handleDelete = (row) => {
+                let item = row
+                item.begin = new Date(item.begin).getTime()
+                event.DeleteItem(item
+                // 记得删除数据
+            }
 
             let searchForm = reactive({
                 key:"",
@@ -98,7 +122,10 @@ import { reactive } from 'vue'
             return{
                 store,
                 searchForm,
-                search
+                search,
+                filterData,
+                searchvaule,
+                handleDelete
             }
         }
     }
