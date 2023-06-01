@@ -36,6 +36,7 @@
                 <el-input
                 v-model="freeTimeStore.form.key"
                 placeholder="请输入用户名或者组织名"
+                autofocus="false"
             >
 
             <template #prepend>

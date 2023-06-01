@@ -1,8 +1,11 @@
 <template>
   <div >
     
-    <div class="text_1">
-        {{weekday}}
+    <div class="text_1" >
+        <div class="weektitle">
+            {{ weekday }}
+            <div class="number" v-if="filterData != null">{{ filterData.length }}</div>
+        </div>
     </div>
     
     <div class="eventshow">
@@ -18,11 +21,17 @@
             </div>        
 
 
-            <div class="eventcard" v-for="(item,itemIndex) in weekdata" :key="itemIndex" :style="SetItem(item)" @mouseenter="store.eventShow = false;store.showEvent = item" @mouseleave="store.eventShow = true" v-show="store.className == '' || item.group == store.className">
+            <div class="eventcard" v-for="(item,itemIndex) in filterData" :key="itemIndex" :style="SetItem(item)" @mouseenter="store.eventShow = false;store.showEvent = item" @mouseleave="store.eventShow = true" > 
+                <!-- v-show="store.className == '' || item.group == store.className" -->
                 <div class="title">
                     {{ item.title }}
                 </div>
+                
                 <el-button  class="delete" :icon="Delete" plain="true" text="true" @click="store.DeleteItem(item)"></el-button>
+                
+                <!-- 处理闹钟 -->
+                
+                <el-icon class="alarm" :color="item.alarmFlag?'#409eff':'#ccc'" @click="store.ChangeAlarm(item)"><BellFilled /></el-icon>
             </div>
             
 
@@ -35,14 +44,16 @@
 import { Delete } from '@element-plus/icons-vue'
 import { useEventTableStore, useLoginStore, useTimeStore ,useOperationStore, useCssStore} from '@/store/pinia'
 import { ElNotification } from 'element-plus'
+import { computed } from 'vue'
     export default {
         props:['weekday','weekdata','weekindex'],
-        setup(){
+        setup(props){
             let time = useTimeStore()
             let store = useEventTableStore()
             let user = useLoginStore()
             let option = useOperationStore()
             let css = useCssStore()
+
             //颜色的数组,可以根据type显示不同颜色
             let SetItem = (item)=>{
                 let now = new Date(item.begin)
@@ -57,11 +68,11 @@ import { ElNotification } from 'element-plus'
             // 修改type circle begin等值达到自动填充的效果
             let addClass = (index,boxIndex)=>{
                 //type 
-                let type = -1
+                let indexID = -1
                 for(let i = 0;i < user.userData.owner.length;i++){
-                    if(user.userData.owner[i] == store.className) type = i
+                    if(user.userData.owner[i] == store.className) indexID = i
                 }
-                if(type == -1){
+                if(indexID == -1){
                     ElNotification({
                             title:"无操作权限",
                             message:"您不是该组织的持有者",
@@ -70,7 +81,7 @@ import { ElNotification } from 'element-plus'
                         })
                     return 
                 }else{
-                    store.form.type = type
+                    store.form.indexID = indexID
                 }
                 //时间
                 let now = time.GlobalTime;
@@ -90,6 +101,7 @@ import { ElNotification } from 'element-plus'
                 //结束时间,一学期
                 store.form.end = new Date();
                 (store.form.end).setDate(store.form.date.getDate() + 7 * 18);
+                store.form.type = "日常课程";
                 option.addShow = true
             }
             let SetShape = (boxIndex)=>{
@@ -97,12 +109,26 @@ import { ElNotification } from 'element-plus'
                     top: boxIndex*6 + 48 + 'vh',
                 }
             }
+            
+            let filterData = computed(()=>{
+                // 对weekdata进行筛选
+                if(props.weekdata == null) return []
+                return props.weekdata.filter((item)=>{
+                    if(store.className == '') return true
+                    if(item.group == store.className){
+                        return true
+                    }else{
+                        return false
+                    }
+                })
+            })
             return{
                 store,
                 SetItem,
                 Delete,
                 addClass,
-                SetShape
+                SetShape,
+                filterData
             }
         }
     }
@@ -202,5 +228,42 @@ import { ElNotification } from 'element-plus'
         padding: 2px;
         top: 0;
         right: 0;
+    }
+    .delete:hover{
+        cursor: pointer;
+        color: red;
+    }
+    .alarm{
+        position: absolute;
+        width: 1vh;
+        height: 1vh;
+        font-size: 1vh;
+        margin: 0;
+        padding: 2px;
+        top: 0;
+        left: 0;
+    }
+    .alarm{
+        cursor: pointer;
+    }
+    .weektitle{
+        position: relative;
+        margin-top: 3px;
+        padding: 5px;
+        color: #20a0ff;
+        font-size: 1.5rem;
+    }
+    .number{
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 0.5vw;
+        height: 1.5vw;
+        border-radius: 50%;
+        background-color: #20a0ff;
+        color: white;
+        font-weight: 900;
+        font-size: 1.5rem;
+        padding:0 5px;
     }
 </style>

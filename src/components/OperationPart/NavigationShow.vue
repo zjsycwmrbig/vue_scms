@@ -16,12 +16,6 @@
         </template>
 
         <div class="map">
-            <!-- <transition-group 
-                name="group-anime"
-                enter-active-class="animate__animated"
-                leave-active-class="animate__animated"
-            >
-        </transition-group> -->
                 <!-- 渲染起点 -->
                 <div class="start">
                     // 把点坐标放进去

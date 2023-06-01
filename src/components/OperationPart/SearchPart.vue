@@ -57,13 +57,18 @@
     <el-divider>查询结果</el-divider>
     <el-table v-if="Array.isArray(search.searchRes)" :data="filterData" height="700" style="width: 100%">
         <el-table-column prop="title" label="标题"  />
-        <!-- <el-table-column prop="group" label="组织"  /> -->
         <el-table-column
           prop="group"
           label="组织"
           sortable
           :filters="filterGroupList"
           :filter-method="groupFilterHandler"
+        />
+        <el-table-column
+          prop="type"
+          label="类型"
+          :filters="filterTypeList"
+          :filter-method="typeFilterHandler"
         />
         <!-- 组织筛选 -->
         <el-table-column prop="begin" label="事项开始时间"  />
@@ -81,6 +86,13 @@
         <el-input v-model="searchvaule" size="small" placeholder="搜索" />
       </template>
       <template #default="scope">
+        <el-button
+          :type="scope.row.alarmFlag?'primary':'danger'"
+          @click="handleAlarm(scope.row)"
+          >
+          闹钟
+        </el-button>
+
         <el-button
           type="danger"
           @click="handleDelete(scope.row)"
@@ -107,6 +119,7 @@ import { ref,computed } from 'vue'
             let search = useSearchStore()
             let store = useOperationStore()
             let event = useEventTableStore()
+
             //表单数据
             const searchvaule = ref('')
             
@@ -139,6 +152,21 @@ import { ref,computed } from 'vue'
             })
 
 
+            let filterTypeList = computed(()=>{
+                let list = []
+                search.searchRes.forEach((item)=>{
+                    if(!list.includes(item.type)){
+                        list.push({text: item.type, value: item.type})
+                    }
+                })
+                return list
+            })
+
+
+            const handleAlarm = (row) => {
+                event.ChangeAlarm(row)
+                
+            }
 
             const handleDelete = (row) => {
                 let item = row
@@ -169,6 +197,10 @@ import { ref,computed } from 'vue'
                 return row.location.includes(vaule)
             }
 
+            let typeFilterHandler = (vaule,row)=>{
+                return row.type == vaule
+            }
+
             //表单提交
             
             return{
@@ -178,10 +210,13 @@ import { ref,computed } from 'vue'
                 filterData,
                 filterGroupList,
                 filterLocationList,
+                filterTypeList,
                 searchvaule,
                 handleDelete,
+                handleAlarm,
                 groupFilterHandler,
-                locationFilterHandler
+                locationFilterHandler,
+                typeFilterHandler
 
             }
         }

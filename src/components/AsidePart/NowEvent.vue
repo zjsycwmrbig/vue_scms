@@ -72,23 +72,23 @@
 </template>
 
 <script>
-import { useEventTableStore, useLoginStore, useTimeStore,useMapStore, useFuncStore } from '@/store/pinia'
+import { useEventTableStore,useMapStore, useFuncStore } from '@/store/pinia'
 import { computed, ref} from 'vue'
 export default {
     name: 'NowEvnet',
     setup() {
         let store = useEventTableStore()
-        let state = useLoginStore()
-        let time = useTimeStore()
+        // let state = useLoginStore()
+        // let time = useTimeStore()
         let map = useMapStore()
         let func = useFuncStore()
         let eventType = ['日常课程','课外活动','临时事务']
-        
-        setInterval(()=>{
-            if(state.loginstate == 1){
-            time.LocateItem()//更新store中的数据
-        }
-        },100)
+        // 定义了一个定位的函数
+        // setInterval(()=>{
+        //     if(state.loginstate == 1){
+        //     //更新store中的数据
+        // }
+        // },100)
 
         let showFlag = ref(false)
 

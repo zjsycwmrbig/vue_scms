@@ -213,9 +213,9 @@ const useTimeStore = defineStore('time',{
                 time.GlobalTime = new Date(parseInt(event.data.time))
                 if (event.data.getdata) {
                     eventStore.GetWeekData()
-                    console.log(event.data);
                 }
-                
+                // 定位进度 , 这样保证异步和同步的问题
+                time.LocateItem()
             }
 
             // let event = useEventTableStore()
@@ -252,9 +252,10 @@ const useTimeStore = defineStore('time',{
             }
         },
 
-        //根据二分算法实现定位
+        //根据二分算法实现定位 , 实现进度条 闹钟定时提醒等
         LocateItem(){
             let event = useEventTableStore()
+
             if(event.dataList.length == 0){
                 event.nowEvent.item = null
                 event.nowEvent.progress = 0
@@ -302,9 +303,9 @@ const useTimeStore = defineStore('time',{
                     progress = (((value - item.begin)*100) / (item.length)).toFixed(1)
                     event.summary.done = index
                     if(progress < 0){
-                        // 现在的事项就是需要和ringTime进行比较提醒的事件
+                        // 现在的事项就是需要和ringTime进行比较提醒的事件 并且需要提醒
                         let det = item.begin - value
-                        if(det < event.ringTime * 60 * 60 * 1000 ){
+                        if(item.alarmFlag && det < event.ringTime * 60 * 60 * 1000){
                             //提醒一下
                             if(this.ringFlag == false){
                                 ElNotification({
@@ -514,8 +515,58 @@ const useEventTableStore = defineStore('eventtable',{
                 }
             }
             event.summary.total = event.dataList.length //更新summary的数据
+        },
+        //调整闹钟
+        async ChangeAlarm(item){
+            let begin = item.begin
+            // 处理搜索时候的时间
+            if(!Number.isInteger(begin)){
+                begin = new Date(begin).getTime()
+            }
+            let respose;
+            if(item.alarmFlag){
+                // 删除闹钟
+                await axios.get('/api/delete/alarm',{
+                    params:{
+                        key:begin
+                    }
+                }).then(function(res){
+                    respose = res
+                })
+            }else{
+                await axios.get('/api/add/alarm',{
+                    params:{
+                        key:begin,
+                        indexID:item.indexID
+                    }
+                }).then(function(res){
+                    respose = res
+                })
+            }
+
+            if(respose.status == 200){
+                if(respose.data.res == true){
+                    ElNotification({
+                        title:"操作成功",
+                        message:"已"+(item.alarmFlag?"删除":"添加")+"闹钟",
+                        type:"success",
+                        position:"bottom-right"
+                    })
+                    // 看看这里会更新吗
+                    item.alarmFlag = !item.alarmFlag
+                }
+            }else{
+                ElNotification({
+                    title:"操作失败",
+                    message:"服务器错误",
+                    type:"error",
+                    position:"bottom-right"
+                })
+            }
+
+
         }
-}
+    }
 })
 //地图
 const useMapStore = defineStore('map',{
@@ -786,11 +837,12 @@ const useFindFreeTimeStore = defineStore('freeTime',{
         }
     },
     actions:{
+        // 更改表达,调用函数
         async FindFreeTime(){
             let data = useFindFreeTimeStore()
             let form = data.form
             let mode = "user"
-            console.log(form);
+            
             switch(form.mode){
                 case '0':
                     // 用户空闲时间
@@ -801,7 +853,7 @@ const useFindFreeTimeStore = defineStore('freeTime',{
                     mode = "org"
                     break;
             }
-            console.log(form);
+            
             await axios.get(`/api/query/${mode}_free_time`,{
                 params:{
                     key:form.key,
@@ -1015,8 +1067,20 @@ const useFuncStore = defineStore('func',{
 
             return `${hour}小时${minute}分钟`
         },
-        FormatEventListData(List){
+        FormatType(type){
+            switch(type){
+                case 0:
+                    return '日常课程'
+
+                case 1:
+                    return '课外活动'
+                case 2:
+                    return '临时事务'
+            }
+        },
+        FormatEventListData(RestList){
             // 传送过来List
+            let List = RestList
             if(!Array.isArray(List)){
                 return null
             }else{
@@ -1025,7 +1089,9 @@ const useFuncStore = defineStore('func',{
                     // 格式化
                     List[i].begin = this.FormatTime(List[i].begin)
                     List[i].length = this.FormatTimeLength(List[i].length)
+                    List[i].type = this.FormatType(List[i].type)
                     let location = points.FormatLocationList(List[i].location,List[i].type)
+                    
                     if(Array.isArray(location)){
                         // 临时事件
                         List[i].location = location.join('|')
