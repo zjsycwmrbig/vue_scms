@@ -18,6 +18,7 @@
   <div class="HitoPart">
     <HitoPart/> 
   </div>
+
 </template>
 
 <script>
@@ -69,7 +70,6 @@ export default {
   width: 100%;
   height: 100%;
 }
-
 .userbox{
   width: 100vw;
   height: 100vh;

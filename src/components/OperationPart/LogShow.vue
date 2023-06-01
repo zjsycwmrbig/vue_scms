@@ -15,15 +15,14 @@
                                     {{ item.localDateTime }}
                                 </div>
                         </div>
-                        <div style="height: 100%;">
-                            <div class="operate">
-                                {{ item.operate }}
-                            </div>
-                        </div>
                         
+                        <div class="operate">
+                            {{ item.operate }}
+                        </div>
+
                     </div>
             </div>
-            <div class="pagination">
+            <div class="pagination" style="display: flex; justify-content: space-around;">
                 <el-pagination
                   :current-page="form.currentPage"
                   :page-size="form.pageSize"
@@ -33,6 +32,10 @@
                   background
                 >
                 </el-pagination>
+
+                <el-button @click="refreshCurrentPage"> 
+                    <el-icon><RefreshRight /></el-icon>
+                </el-button>
             </div>
         </div>
         
@@ -68,11 +71,15 @@ export default {
             form.pageCount = Math.ceil(log.total / form.pageSize)
         }
         
+        let refreshCurrentPage = () => {
+            log.GetLog(form)
+        }
         return{
             store,
             form,
             log,
             handleCurrentChange,
+            refreshCurrentPage
         }
     },
 }
@@ -95,7 +102,8 @@ export default {
         text-align: center;
         height: 100%;
         color: #facac8;
-        font-size: 2.5rem;
+        font-size: fit-content;
         margin: auto 0;
+        overflow: hidden;
     }
 </style>

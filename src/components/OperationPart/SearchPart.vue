@@ -50,7 +50,7 @@
 
         <div class="tab">
             <el-button @click="searchForm.mode = !searchForm.mode" >
-            <el-icon ><Filter/></el-icon>
+                <el-icon><Switch /></el-icon>切换搜索模式
             </el-button>
         </div>
     </div>
@@ -81,25 +81,34 @@
           :filter-method="locationFilterHandler"
         />
         <el-table-column prop="locationData" label="地点备注" />
+        
+        
+        
         <el-table-column align="right">
-      <template #header>
-        <el-input v-model="searchvaule" size="small" placeholder="搜索" />
-      </template>
-      <template #default="scope">
-        <el-button
-          :type="scope.row.alarmFlag?'primary':'danger'"
-          @click="handleAlarm(scope.row)"
-          >
-          闹钟
-        </el-button>
+            <template #header>
+                <el-input v-model="searchvaule" size="small" placeholder="搜索" />  
+            </template>
+      
+        <template #default="scope">
+            <el-button
+                  :type="scope.row.alarmFlag?'primary':'info'"
+                  @click="handleAlarm(scope.row)"
+                  >
+                    <el-icon v-if="scope.row.alarmFlag"><Bell /></el-icon>
+                    <el-icon v-else><MuteNotification /></el-icon>
+            </el-button>
+            
+            
+            <el-button
+              type="danger"
+              @click="handleDelete(scope.row)"
+              >
+              <el-icon><DeleteFilled /></el-icon>
+            </el-button>
 
-        <el-button
-          type="danger"
-          @click="handleDelete(scope.row)"
-          >
-          删除
-          </el-button>
+            
       </template>
+
     </el-table-column>
     </el-table>
     <el-empty v-else :image-size="500" />
@@ -112,9 +121,6 @@ import { useEventTableStore, useOperationStore,useSearchStore } from '@/store/pi
 import { reactive } from 'vue'
 import { ref,computed } from 'vue'
     export default {
-        components:{
-            
-        },
         setup(){
             let search = useSearchStore()
             let store = useOperationStore()
@@ -129,9 +135,11 @@ import { ref,computed } from 'vue'
 
             const filterGroupList = computed(()=>{
                 let list = []
+                let temp = []
                 search.searchRes.forEach((item)=>{
-                    if(!list.includes(item.group)){
+                    if(!temp.includes(item.group)){
                         list.push({text: item.group, value: item.group})
+                        temp.push(item.group)
                     }
                 })
                 return list
@@ -139,12 +147,14 @@ import { ref,computed } from 'vue'
 
             const filterLocationList = computed(()=>{
                 let list = []
+                let temp = []
                 search.searchRes.forEach((item)=>{
                     // 获得地点列表
                     let locations = item.location.split('|')
                     locations.forEach((location)=>{
-                        if(!list.includes(location)){
+                        if(!temp.includes(location)){
                             list.push({text:location,value:location})
+                            temp.push(location)
                         }
                     })
                 })
@@ -154,13 +164,17 @@ import { ref,computed } from 'vue'
 
             let filterTypeList = computed(()=>{
                 let list = []
+                let temp = []
                 search.searchRes.forEach((item)=>{
-                    if(!list.includes(item.type)){
+                    if(!temp.includes(item.type)){
                         list.push({text: item.type, value: item.type})
+                        temp.push(item.type)
                     }
                 })
                 return list
             })
+
+
 
 
             const handleAlarm = (row) => {
@@ -233,7 +247,7 @@ import { ref,computed } from 'vue'
     }
     .tab{
         position: absolute;
-        right: -3vw;
+        right: -8vw;
         top: 0;
     }
 </style>

@@ -28,6 +28,10 @@
                 <el-button size="large" @click="asideStore.freeTimeShow = !asideStore.freeTimeShow">
                     <el-icon><Clock /></el-icon>
                 </el-button>
+                <el-button size="large" @click="asideStore.alarmShow = !asideStore.alarmShow">
+                    <el-icon><el-icon><Star /></el-icon></el-icon>
+                </el-button>
+
                 </el-button-group>
             </el-col>
             <!-- 中心标题 -->
@@ -46,6 +50,8 @@
             <NavigationInput/>
             <!-- 注册查找空闲时间模块 -->
             <FindFree/>
+            <!-- 注册重要事项模块 -->
+            <AlarmPart/>
         </el-row>
     </div>
 </template>
@@ -59,6 +65,7 @@ import LogShow from '../OperationPart/LogShow.vue'
 import NavigationInput from '../OperationPart/NavigationInput.vue'
 import { useOperationStore } from '@/store/pinia'
 import FindFree from '../OperationPart/FindFree.vue'
+import AlarmPart from '../OperationPart/AlarmShow.vue'
     export default {
         name:"UserHeader",
         components:{
@@ -66,7 +73,8 @@ import FindFree from '../OperationPart/FindFree.vue'
             SearchPart,
             LogShow,
             NavigationInput,
-            FindFree
+            FindFree,
+            AlarmPart
         },
         setup(){
             let asideStore = useOperationStore()

@@ -196,6 +196,7 @@ const useTimeStore = defineStore('time',{
             Timespeed:1,       
             ringTemp:false,//标注是否该弹出通知
             clockWebWorker:Worker,
+            ringMute:false
         }
     },
     actions:{
@@ -305,7 +306,7 @@ const useTimeStore = defineStore('time',{
                     if(progress < 0){
                         // 现在的事项就是需要和ringTime进行比较提醒的事件 并且需要提醒
                         let det = item.begin - value
-                        if(item.alarmFlag && det < event.ringTime * 60 * 60 * 1000){
+                        if(!this.ringMute && item.alarmFlag && det < event.ringTime * 60 * 60 * 1000){
                             //提醒一下
                             if(this.ringFlag == false){
                                 ElNotification({
@@ -379,7 +380,8 @@ const useEventTableStore = defineStore('eventtable',{
                 location:mapStore.mapForm.location,
                 locationData:'',
                 alarmFlag:false,
-            }
+            },
+            
         }
     },
 
@@ -816,6 +818,7 @@ const useOperationStore = defineStore('aside',{
             messageShow:false,
             navigationShow:false,
             freeTimeShow:false,
+            alarmShow:false,
         }
     },
     actions:{
@@ -1105,8 +1108,6 @@ const useFuncStore = defineStore('func',{
 
     }
 })
-
-
 export{
     useLoginStore,
     useTimeStore,
@@ -1120,5 +1121,6 @@ export{
     useFindFreeTimeStore,
     useLogStore,
     useFuncStore
+    
 }
 
