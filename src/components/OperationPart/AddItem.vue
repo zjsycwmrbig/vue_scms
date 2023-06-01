@@ -11,6 +11,11 @@
           <el-select v-model="eventStore.form.indexID" placeholder="选择事项集">
             <el-option v-for="(item,index) in userStore.userData.owner" :key="index" :label="index==0?'个人事项':item" :value="index" />
           </el-select>
+
+          <el-button @click="eventStore.form.alarmFlag = !eventStore.form.alarmFlag" :color="eventStore.form.alarmFlag?'#409eff':'#909399'">
+            <el-icon><AlarmClock /></el-icon>
+          </el-button>
+
         </el-form-item>
       <el-form-item label="事项名称及地点">
       <el-col :span="12">
@@ -102,7 +107,8 @@ import { useMapStore,useOperationStore,useLoginStore,useEventTableStore } from '
               minuteLength:0,
               circle:0,
               type: '',
-              location:mapStore.mapForm.location
+              location:mapStore.mapForm.location,
+              alarmFlag: false,
           })
 
           // 捷径

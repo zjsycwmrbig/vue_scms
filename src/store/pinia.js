@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import { ElMessage, ElNotification } from "element-plus";
+
 //登录store
 const useLoginStore = defineStore('Login',{
     
@@ -200,17 +201,21 @@ const useTimeStore = defineStore('time',{
     actions:{
         //开始计时
         BeginTime(){
+            let eventStore = useEventTableStore()
             let time = useTimeStore()
             // 开始时间并且定位进度
             time.GlobalTime = new Date();
             this.clockWebWorker = new Worker('http://localhost:8080/clock.worker.js');
             
             this.clockWebWorker.postMessage("start")
+            
             this.clockWebWorker.onmessage = function (event) {
-                if (event.data.getdata) {
-                    event.GetWeekData()
-                }
                 time.GlobalTime = new Date(parseInt(event.data.time))
+                if (event.data.getdata) {
+                    eventStore.GetWeekData()
+                    console.log(event.data);
+                }
+                
             }
 
             // let event = useEventTableStore()
@@ -371,7 +376,8 @@ const useEventTableStore = defineStore('eventtable',{
                 indexID:'',
                 type: '',
                 location:mapStore.mapForm.location,
-                locationData:''
+                locationData:'',
+                alarmFlag:false,
             }
         }
     },
@@ -385,10 +391,31 @@ const useEventTableStore = defineStore('eventtable',{
                     date:Timestore.GlobalTime.getTime()
                 }
             }).then(function(respose){
-                let event = useEventTableStore()
-                event.weekData = respose.data.routines;//数组,包含index和数据
-                event.BuildDataList(respose.data.routines) //构建
-                event.show = true;
+                if(respose.status == 200){
+                    if(respose.data.res == true){
+                        let event = useEventTableStore()
+                        // let map = useMapStore()
+                        event.weekData = respose.data.routines;//数组,包含index和数据
+                        event.BuildDataList(respose.data.routines) //构建
+                        event.show = true;
+                        // 生成导航input
+                        // map.CreateOption()
+                    }else{
+                        ElNotification({
+                            title: '获取数据失败',
+                            message: '服务器错误',
+                            type: 'error',
+                        })
+                    }
+                }else{
+                    ElNotification({
+                        title: '获取数据失败',
+                        message: '服务器错误',
+                        type: 'error',
+                    })
+                }
+                    
+                
                 // 构建LocateItem
             })
         },
@@ -415,7 +442,8 @@ const useEventTableStore = defineStore('eventtable',{
                 end:form.end==''? (datebegin +form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000):(form.end.getTime()),
                 length:form.hourLength * 60 * 60 *1000 + form.minuteLength*60*1000,
                 locationData:form.locationData,
-                size:0
+                size:0,
+                alarmFlag:form.alarmFlag
             }).then(function(respose){
                 if(respose.data.res == true){
                     ElNotification({
@@ -544,31 +572,37 @@ const useMapStore = defineStore('map',{
         CreateOption(){
             //生成选项 , 这里在临时事件改变后需要做调整
             if(this.navigation.key == ''){
-                var event = useEventTableStore()
-                if(event.dataList == null) console.log("dataList为空");
+                let event = useEventTableStore()
+                let location = useMapStore()
                 // 默认情况下,把当下所有的事件加入到里面
                 this.showOption = new Array()
+                let map = useMapStore()
                 for(let i = 0;i < event.dataList.length;i = i + 1){
                     //依次加入
                     let temp = event.weekData[event.dataList[i].weekIndex].list[event.dataList[i].index]
+                    
                     if(temp.location != '' && temp.location != -1){
-                        this.showOption.push({
-                            title:temp.title,
-                            location:temp.location,
-                            locationName:this.points[temp.location-1].name
-                        })
+                        // 地点是存在的
+                        let list = location.FormatLocationList(temp.location,temp.type)
+                    
+                        if(Array.isArray(list)){
+                            // 临时事件
+                            list.forEach(element => {
+                                if(map.showOption.indexOf(element) == -1)map.showOption.push(element)    
+                            })
+                        }else{
+                            // 正常事件
+                            map.showOption.push(list)
+                        }
+                        
                     }
                 }
             }else{
                 // 根据关键词搜索
                 this.showOption = new Array()
                 for(let i = 1;i <= this.points.length;i = i + 1){
-                    if(this.points[i-1].name.indexOf(this.navigation.key) != -1){
-                        this.showOption.push({
-                            title:'',
-                            location:i,
-                            locationName:this.points[i-1].name
-                        })
+                    if(this.points[i-1].name.indexOf(this.navigation.key) != -1 && this.showOption.indexOf(this.points[i-1].name) == -1){
+                        this.showOption.push(this.points[i-1].name)
                     }
                 }
             }
@@ -642,18 +676,27 @@ const useMapStore = defineStore('map',{
             
         },
         // 格式化地点信息
-        FormatLocation(location,type){
+        FormatLocationList(location,type){
+            if(location == '') return '无地点'
             if(type == 2){
                 // 临时事件
                 let locations = location.split('|')
-                console.log(locations);
                 for(let i = 0;i < locations.length;i = i + 1) {
                     locations[i] = this.points[locations[i]-1].name
                 }
                 return locations
             }else{
                 // 普通时间
-                return this.points[location-1].name
+                return this.points[parseInt(location)-1].name
+            }
+        },
+        // 格式化时间
+        FormatLocationString(location,type){
+            let res = this.FormatLocationList(location,type)
+            if(Array.isArray(res)){
+                return res.join('|')
+            } else {
+                return res
             }
         },
         // 依次步入导航
@@ -662,7 +705,7 @@ const useMapStore = defineStore('map',{
             // 初始化
             store.navigationShowList = new Array()
             let index = 0
-            
+
             // 对导航内容进行阶段性更新
             let fadeTab = function(index){
                 if(index < 5){
@@ -964,6 +1007,8 @@ const useFuncStore = defineStore('func',{
         },
         // 长度格式化
         FormatTimeLength(length){
+
+            length = parseInt(length)
             // 小时和分钟
             let hour = Math.floor(length/(60*60*1000))
             let minute = Math.floor((length/(60*1000))%60)
@@ -980,7 +1025,7 @@ const useFuncStore = defineStore('func',{
                     // 格式化
                     List[i].begin = this.FormatTime(List[i].begin)
                     List[i].length = this.FormatTimeLength(List[i].length)
-                    let location = points.FormatLocation(List[i].location,List[i].type)
+                    let location = points.FormatLocationList(List[i].location,List[i].type)
                     if(Array.isArray(location)){
                         // 临时事件
                         List[i].location = location.join('|')

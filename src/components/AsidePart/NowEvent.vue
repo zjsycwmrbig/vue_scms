@@ -1,24 +1,23 @@
 <template>
         <div class="eventshow">
-            <!-- 当前事件 -->
-            <el-card class="box-card" v-show="store.eventShow">
+            <el-card class="box-card">
             <template #header>
                 <div class="head">
-                    <span style="font-size: 1.2rem;">{{ store.nowEvent.item == null ? "今日无事": store.nowEvent.item.title}}</span>
+                    <span style="font-size: 1.2rem;">{{ showData == null ? "今日无事": showData.title}}</span>
                     <span>
                         <el-tag
                             type="info"
                             effect="dark"
                             round
                         >
-                          {{ store.nowEvent.item != null ? store.nowEvent.item.group : '闲'}}
+                          {{ showData != null ? showData.group : '闲'}}
                         </el-tag>
                         <el-tag
                             type="primary"
                             effect="dark"
                             round
                         >
-                          {{ store.nowEvent.item != null ? eventType[store.nowEvent.item.type] : '闲'}}
+                          {{ showData != null ? eventType[showData.type] : '闲'}}
                         </el-tag>
                     </span>
                 </div>
@@ -32,8 +31,8 @@
                                     <span>开始时间</span>
                                 </div>
                             </template>
-                            <el-text v-if="store.nowEvent.item != null">{{(new Date(store.nowEvent.item.begin)).toLocaleString()}}</el-text>
-                            <el-text v-else class="text_1">放</el-text>
+                            <el-text v-if="showData != null">{{ func.FormatTime(showData.begin) }}</el-text>
+                            <el-text v-else class="text_1">无</el-text>
                         </el-card>
                     </el-col>
                     <el-col :span="8">
@@ -43,13 +42,10 @@
                                     <span>事项地点</span>
                                 </div>
                             </template>
-                            <el-text v-if="store.nowEvent.item != null">{{
-                                map.points[store.nowEvent.item.location-1]!=null?map.points[store.nowEvent.item.location-1].name:"无地点"
-                            }}
-                            <el-divider></el-divider>
-                            {{ store.nowEvent.item.locationData }}
+                            <el-text v-if="showData != null">
+                                {{ map.FormatLocationString(showData.location,showData.type)}} 备注信息: {{ showData.locationData }}
                             </el-text>
-                            <el-text v-else class="text_1">假</el-text>
+                            <el-text v-else class="text_1">事</el-text>
                         </el-card>
                     </el-col>
                     <el-col :span="8">
@@ -59,10 +55,10 @@
                                     <span>持续时间</span>
                                 </div>
                             </template>
-                            <el-text v-if="store.nowEvent.item != null">{{ store.nowEvent.item.length/(1000*60*60) + '时' + ((store.nowEvent.item.length)%(1000*60*60))/(1000*60) + '分' }}</el-text>
-                            <el-text v-else class="text_1">了</el-text>
+                            <el-text v-if="showData!=null">{{ func.FormatTimeLength(showData.length) }}</el-text>
+                            <el-text v-else class="text_1">件</el-text>
                         </el-card>
-                        </el-col>
+                    </el-col>
                 </el-row>
             </div>
             <el-divider></el-divider>
@@ -70,71 +66,14 @@
                 <el-progress  :show-text="false" :percentage="store.nowEvent.progress" :stroke-width="15" striped striped-flow/>    
             </div>
             </el-card>
-            <!-- 展示事件 -->
-            <el-card class="box-card" v-if="!store.eventShow">
-            <template #header>
-                <div class="head">
-                    <span style="font-size: 1.2rem;">{{ store.showEvent.title}}</span>
-                    <span>
-                        <el-tag
-                            type="info"
-                            effect="dark"
-                            round
-                        >
-                          {{ store.showEvent != null ? store.showEvent.group : ''}}
-                        </el-tag>
-                        <el-tag
-                            type="primary"
-                            effect="dark"
-                            round
-                        >
-                          {{ store.showEvent != null ? eventType[store.showEvent.type] : '闲'}}
-                        </el-tag>
-                    </span>
-                </div>
-            </template>
-            <div class="body" v-if="store.showEvent!=null">
-                <el-row gutter="20">
-                        <el-col :span="8">
-                        <el-card class="box-card">
-                            <template #header>
-                                <div class="text_2">
-                                    <span>开始时间</span>
-                                </div>
-                            </template>
-                            <el-text>{{(new Date(store.showEvent.begin)).toLocaleString()}}</el-text>
-                        </el-card>
-                    </el-col>
-                    <el-col :span="8">
-                        <el-card class="box-card" >
-                            <template #header>
-                                <div class="text_2">
-                                    <span>事项地点</span>
-                                </div>
-                            </template>
-                            <el-text>{{map.points[store.showEvent.location-1] != null?map.points[store.showEvent.location-1].name:无地点}}</el-text>
-                        </el-card>
-                    </el-col>
-                    <el-col :span="8">
-                        <el-card class="box-card">
-                            <template #header>
-                                <div class="text_2">
-                                    <span>持续时间</span>
-                                </div>
-                            </template>
-                            <el-text>{{ store.showEvent.length/(1000*60*60) + '时' + ((store.showEvent.length)%(1000*60*60))/(1000*60) + '分' }}</el-text>
-                        </el-card>
-                        </el-col>
-                </el-row>
-            </div>
-            <el-divider></el-divider>
-            <el-progress  :show-text="false" :percentage="100" :stroke-width="15" striped striped-flow/>    
-        </el-card>
+            <!-- 事件展示 -->
+            
         </div>
 </template>
 
 <script>
-import { useEventTableStore, useLoginStore, useTimeStore,useMapStore } from '@/store/pinia'
+import { useEventTableStore, useLoginStore, useTimeStore,useMapStore, useFuncStore } from '@/store/pinia'
+import { computed, ref} from 'vue'
 export default {
     name: 'NowEvnet',
     setup() {
@@ -142,22 +81,51 @@ export default {
         let state = useLoginStore()
         let time = useTimeStore()
         let map = useMapStore()
+        let func = useFuncStore()
         let eventType = ['日常课程','课外活动','临时事务']
+        
         setInterval(()=>{
             if(state.loginstate == 1){
             time.LocateItem()//更新store中的数据
         }
         },100)
+
+        let showFlag = ref(false)
+
+        let showData = computed(() => {
+            if(store.eventShow) {
+                return store.nowEvent.item
+            }
+            else return store.showEvent
+        })
+        setTimeout(() => {
+            store.eventShow = true    
+        }, 10);
+        
+        // 更新数据
+        
+
+
+
         return {
             store,
             map,
-            eventType
+            func,
+            eventType,
+            showData,
+            showFlag
         }
     }
 }
 </script>
 
+
+
+
+
 <style scoped>
+
+
 .eventshow{
     width: 100%;
     height: 30vh;

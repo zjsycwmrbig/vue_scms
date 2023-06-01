@@ -8,7 +8,6 @@
         <div class="count">
             <div class="countbox"><div class="countnum">{{ ((login.userData.owner)).length }}</div><div class="counttip">创建</div></div>
             <div class="countbox"><div class="countnum">{{ (login.userData.player).length }}</div><div class="counttip">加入</div></div>
-            <div class="countbox"><div class="countnum">{{ (login.userData.tips).length }}</div><div class="counttip">通知</div></div>        
         </div>
         
         <el-divider class="divider"><el-icon size="small"><Star /></el-icon></el-divider>
@@ -18,8 +17,7 @@
             <el-divider direction="vertical"></el-divider>
             <div class="option" @click="login.Logout()"><span>退出登录</span></div>
         </div>
-    </el-card>  
-    <!-- <el-divider><el-text style="font-size: 2px;">{{login.userData.owner[0]}}</el-text></el-divider> -->
+    </el-card>   
   
 </template>
 

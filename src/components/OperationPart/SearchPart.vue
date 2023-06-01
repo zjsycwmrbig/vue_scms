@@ -57,14 +57,28 @@
     <el-divider>查询结果</el-divider>
     <el-table v-if="Array.isArray(search.searchRes)" :data="filterData" height="700" style="width: 100%">
         <el-table-column prop="title" label="标题"  />
-        <el-table-column prop="group" label="组织"  />
+        <!-- <el-table-column prop="group" label="组织"  /> -->
+        <el-table-column
+          prop="group"
+          label="组织"
+          sortable
+          :filters="filterGroupList"
+          :filter-method="groupFilterHandler"
+        />
+        <!-- 组织筛选 -->
         <el-table-column prop="begin" label="事项开始时间"  />
         <el-table-column prop="length" label="事项持续时间"  />
-        <el-table-column prop="location" label="地点"  />
+        <!-- 地点筛选 -->
+        <el-table-column
+          prop="location"
+          label="地点"
+          :filters="filterLocationList"
+          :filter-method="locationFilterHandler"
+        />
         <el-table-column prop="locationData" label="地点备注" />
         <el-table-column align="right">
       <template #header>
-        <el-input v-model="searchvaule" size="small" placeholder="Type to search" />
+        <el-input v-model="searchvaule" size="small" placeholder="搜索" />
       </template>
       <template #default="scope">
         <el-button
@@ -100,6 +114,32 @@ import { ref,computed } from 'vue'
                search.searchRes.filter((data) => !searchvaule.value || data.title.includes(searchvaule.value))
             )
 
+            const filterGroupList = computed(()=>{
+                let list = []
+                search.searchRes.forEach((item)=>{
+                    if(!list.includes(item.group)){
+                        list.push({text: item.group, value: item.group})
+                    }
+                })
+                return list
+            })
+
+            const filterLocationList = computed(()=>{
+                let list = []
+                search.searchRes.forEach((item)=>{
+                    // 获得地点列表
+                    let locations = item.location.split('|')
+                    locations.forEach((location)=>{
+                        if(!list.includes(location)){
+                            list.push({text:location,value:location})
+                        }
+                    })
+                })
+                return list
+            })
+
+
+
             const handleDelete = (row) => {
                 let item = row
                 item.begin = new Date(item.begin).getTime()
@@ -120,6 +160,15 @@ import { ref,computed } from 'vue'
                 ]
             })
 
+
+            let groupFilterHandler = (vaule,row)=>{
+                return row.group == vaule
+            }
+
+            let locationFilterHandler = (vaule,row)=>{
+                return row.location.includes(vaule)
+            }
+
             //表单提交
             
             return{
@@ -127,8 +176,13 @@ import { ref,computed } from 'vue'
                 searchForm,
                 search,
                 filterData,
+                filterGroupList,
+                filterLocationList,
                 searchvaule,
-                handleDelete
+                handleDelete,
+                groupFilterHandler,
+                locationFilterHandler
+
             }
         }
     }

@@ -30,8 +30,8 @@
                           <el-option
                             v-for="(item,index) in mapStore.showOption"
                             :key="index"
-                            :label="item.locationName"
-                            :value="item.locationName"
+                            :label="item"
+                            :value="item"
                             
                           />
                         </el-select>
@@ -123,7 +123,8 @@ export default {
                 let event = eventStore.weekData[index.weekIndex].list[index.index]
                 if(event.location != ''&&event.location != -1){
                     for (let location of mapStore.selectLocations){
-                        if(location == event.location){
+                        if(event.location.includes(location) && mapStore.showEvents.indexOf(event.title) == -1){
+                            //不要重复
                             mapStore.showEvents.push(event.title)
                         }
                     }
