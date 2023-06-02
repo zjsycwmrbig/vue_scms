@@ -141,25 +141,62 @@ const useLoginStore = defineStore('Login',{
             })
         },
         //创建,修改组织
-
-        async ChangeOrg(name,orgitem){
-            
-            // create和jion
-            await axios.get('api/org/'+orgitem,{
+        async CreateOrg(name,createWithPassword){
+            await axios.get('api/org/create',{
                 params:{
-                    org:name
+                    org:name,
+                    password:createWithPassword
                 }
             }).then(function(respose){
-                let user = useLoginStore()   
-                 
+                
                 if(respose.status == 200){
                     if(respose.data.res == true){
-                        if(orgitem == 'create'){
-                            user.userData.owner.push(name)
-                        }else if(orgitem == 'join'){
-                            user.userData.player.push(name)
-                        }
+                        // 更新user数据
+                        let user = useLoginStore()
+                        user.userData.owner.push(name)
+                        user.userData.dataUser.push([user.userData.username])
+                        user.userData.passwords.push(respose.data.data)
                         
+                        ElNotification({
+                            title:"操作成功",
+                            message:respose.data.state,
+                            type:"success",
+                            position:"bottom-right"
+                        })
+
+                        let event = useEventTableStore()
+                        event.GetWeekData()//更新下
+                    }else{
+                        ElNotification({
+                            title:"操作失败",
+                            message:respose.data.state,
+                            type:"error",
+                            position:"bottom-right"
+                        })
+                    }
+                }else{
+                    ElNotification({
+                        title:"请求失败",
+                        message:"服务器错误",
+                        type:"error",
+                        position:"bottom-right"
+                    })
+                }
+            })
+        },
+        //加入组织
+        async JoinOrg(name,password){
+            await axios.get('api/org/join',{
+                params:{
+                    org:name,
+                    password:password
+                }
+            }).then(function(respose){
+                let user = useLoginStore()
+                if(respose.status == 200){
+                    if(respose.data.res == true){
+                        // 仅仅添加一个就好
+                        user.userData.player.push(name)
                         ElNotification({
                             title:"操作成功",
                             message:respose.data.state,
@@ -186,7 +223,8 @@ const useLoginStore = defineStore('Login',{
                 }
             })
         },
-        async DeleteOrg(org){
+        // 删除组织
+        async DeleteOrg(org,index){
             await axios.get('api/org/delete',{
                 params:{
                     org:org
@@ -194,6 +232,11 @@ const useLoginStore = defineStore('Login',{
             }).then(function(respose){ 
                 if(respose.status == 200){
                     if(respose.data.res == true){
+                        // 删除已有的信息
+                        let user = useLoginStore()
+                        user.userData.owner.splice(index,1)
+                        user.userData.passwords.splice(index,1)
+                        user.userData.dataUser.splice(index,1)
                         ElNotification({
                             title:"删除成功",
                             message:respose.data.state,
@@ -223,6 +266,7 @@ const useLoginStore = defineStore('Login',{
                 }
             })
         },
+        // 退出组织
         async RemoveOrg(org){
             await axios.get('api/org/quit',{
                 params:{
@@ -231,6 +275,9 @@ const useLoginStore = defineStore('Login',{
             }).then(function(respose){
                 if(respose.status == 200){
                     if(respose.data.res == true){
+                        let user = useLoginStore()
+                        // 移除组织
+                        user.userData.player.splice(user.userData.player.indexOf(org),1)
                         ElNotification({
                             title:"退出成功",
                             message:respose.data.state,
@@ -259,6 +306,7 @@ const useLoginStore = defineStore('Login',{
                 return false
             })
         },
+        // 移除组织成员
         async RemoveOrgMember(org,user){
             await axios.get('api/org/removeMember',{
                 params:{
@@ -295,7 +343,45 @@ const useLoginStore = defineStore('Login',{
                 }
                 return false
             })
+        },
+        // 修改组织密码
+        async ChangePassword(org,password){
+            await axios.get('api/org/changePassword',{
+                params:{
+                    org:org,
+                    password:password
+                }
+            }).then(function(respose){
+                if(respose.status == 200){
+                    if(respose.data.res == true){
+                        ElNotification({
+                            title:"修改成功",
+                            message:respose.data.state,
+                            type:"success",
+                            position:"bottom-right"
+                        })
+                        // 更新掉密码
+                        return true
+                    }else{
+                        ElNotification({
+                            title:"操作失败",
+                            message:respose.data.state,
+                            type:"error",
+                            position:"bottom-right"
+                        })
+                    }
+                }else{
+                    ElNotification({
+                        title:"请求失败",
+                        message:"服务器错误",
+                        type:"error",
+                        position:"bottom-right"
+                    })
+                }
+                return false
+            })
         }
+
 
     }
 })

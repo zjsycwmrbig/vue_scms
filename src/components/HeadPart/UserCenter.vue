@@ -77,111 +77,134 @@
                       <div class="card-header">
                         <span>我创建的</span>
                       </div>
+
+                      
                     </template>
                     <el-space
                       size="large"
                       wrap="true"
                     >
+                        <!-- 可以点击的选项 -->
                         <el-tag
                             v-for="(orgname,index) in user.userData.owner"
                             :key="index"
                             closable
                             class="org"
                             :disable-transitions="false"
-                            @click="org.showOrg = index"
-                            @close="DeleteOrg(orgname)"
-                            
+                            @click="fillOrgShow(index)"
+                            @close="DeleteOrg(orgname,index)"
                             :color="GetCss(index)"
                         >
-                        {{ orgname }}
-                      </el-tag>
+                          {{ orgname }}
+                        </el-tag>
 
-                      <el-input
-                        v-if="org.inputCreate"
-                        v-model="org.createOrg"
-                        class="ml-1 w-20"
-                        size="small"
-                        @keyup.enter="CreateOrg"
-                        @blur="org.inputCreate = false"
-                        v-focus="org.inputCreate"
-                      />
+                      <div class="createorg" v-if="org.inputCreate" style="display: flex;justify-content: center;">
+                        <el-input
+                          v-model="org.createOrg"
+                          class="ml-1 w-20"
+                          size="small"
+                          @keyup.enter="CreateOrg"
+                          @blur="org.inputCreate = false"
+                          v-focus="org.inputCreate"
+                        />
+                        <el-button @click="org.createWithPassword = !org.createWithPassword" :type="org.createWithPassword?'primary':'info'" >
+                          {{ org.createWithPassword ? "生成口令" : "不设口令" }}
+                        </el-button>
+                      </div>
                       <el-button v-else class="button-new-tag ml-1" size="small" @click="org.inputCreate = true;org.inputJoin=false">
                         创建组织
                       </el-button>
                     </el-space>
                 </el-card>
-              <!-- 邀请模块,展示一个组织的信息 -->
-              
+
+              <!-- 一个组织的信息 -->
               <el-card class="card" >
                 <template #header>
-                      <div class="card-header">
-                        <span> {{ user.userData.owner[org.showOrg] }} </span>
-                      </div>
+                  <el-row>
+                      <el-col :span="8">
+                        <div class="card-header orgtitle">
+                          {{ orgShowData.orgname }}
+                        </div>
+                      </el-col>
+
+                      <el-col :span="16">
+                        <el-input v-if="org.changePassword" v-model="org.newPassword" size="small" class="passwordshow">
+                          <template #append>
+                            <el-button @click="ChangePassword(orgShowData.orgname)">
+                                <el-icon><Check /></el-icon>
+                            </el-button>
+                          </template>
+                        </el-input>
+                        <el-tag v-else  @click="org.changePassword = true;" size="small" class="passwordshow">
+                          {{ FormatPassword(orgShowData.orgpassword) }}
+                        </el-tag>
+                      </el-col>         
+                  </el-row>
                 </template>
 
+                <!-- 用户显示模块 -->
                 <el-space
                       size="large"
                       wrap="true"
                     >
                 <el-tag
-                    v-for="(user,index) in user.userData.dataUser[org.showOrg]"
+                    v-for="(user,index) in orgShowData.orgUsers"
                     :key="index"
                     class="mx-1"
                     closable
                     :disable-transitions="false"
                     effect="dark"
-                    @close="RemoveOrgMember(org.showOrg,user)" 
+                    @close="RemoveOrgMember(orgShowData.orgname,user,index)" 
                   >
-                  <!-- user.userData.owner[org.showOrg] -->
                     {{ user }}
                   </el-tag>
-                
                 </el-space>
 
-                <el-divider>邀请新成员</el-divider>
-
                 
-
-
 
               </el-card>
               <el-card class="card"> 
-                    <template #header>
-                      <div class="card-header">
-                        <span>我加入的</span>
-                      </div>
-                    </template>
-                    <el-space
-                      size="large"
-                      wrap="true"
-                    >
+                  <template #header>
 
-                    <el-tag
-                      v-for="(org,index) in user.userData.player"
-                      :key="index"
-                      class="mx-1"
-                      closable
-                      :disable-transitions="false"
-                      @close="RemoveOrg(org)"
-                      :color="GetCss(-index)"
-                    >
-                      {{ org }}
-                    </el-tag>
+                    <div class="join" style="display: flex;justify-content: space-between;">
+                      <div class="orgtitle">
+                          <span >我加入的</span>
+                      </div>
+                      <el-input v-model="org.joinPassword" size="small" class="joininput"></el-input>
+                    </div>
+
+                  </template>
+                  
+                  <el-space
+                    size="large"
+                    wrap="true"
+                  >
+                  <el-tag
+                    v-for="(org,index) in user.userData.player"
+                    :key="index"
+                    class="mx-1"
+                    closable
+                    :disable-transitions="false"
+                    @close="RemoveOrg(org)"
+                    :color="GetCss(-index)"
+                  >
+                    {{ org }}
+                  </el-tag>
                     
-                    <el-input
-                      v-if="org.inputJoin"
-                      v-model="org.joinOrg"
-                      class="ml-1 w-20"
-                      size="small"
-                      autofocus="true"
-                      @keyup.enter="JoinOrg"
-                      @blur="org.inputJoin = false"
-                      v-focus="org.inputJoin"
-                    />
-                    <el-button v-else class="button-new-tag ml-1" size="small" @click="org.inputJoin = true;org.inputCreate=false">
-                      加入组织
-                    </el-button>
-                    </el-space>
+                  <el-input
+                    v-if="org.inputJoin"
+                    v-model="org.joinOrg"
+                    class="ml-1 w-20"
+                    size="small"
+                    autofocus="true"
+                    @keyup.enter="JoinOrg"
+                    @blur="org.inputJoin = false"
+                    v-focus="org.inputJoin"
+                  />
+                  <el-button v-else class="button-new-tag ml-1" size="small" @click="org.inputJoin = true;org.inputCreate=false">
+                    加入组织
+                  </el-button>
+                </el-space>
               </el-card>
             </div>
             </el-tab-pane>
@@ -193,7 +216,7 @@
 
 <script>
 import { useCssStore, useLoginStore, useOperationStore } from '@/store/pinia'
-import { reactive } from 'vue'
+import {  reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 export default {
     props:['show'],
@@ -208,13 +231,24 @@ export default {
             netname:'',
             personword:''
         })
-
+        // 展示的信息,默认为第一个
+        let orgShowData =reactive( {
+          orgIndex:0,
+          // 三者之间都要更新
+          orgname:user.userData.owner[0],
+          orgpassword:user.userData.passwords[0],
+          orgUsers:user.userData.dataUser[0]
+        })
         let org = reactive({
           showOrg:0,
           inputCreate:false,
           inputJoin:false,
+          changePassword:false,
           createOrg:'',
           joinOrg:'',
+          joinPassword:'',
+          createWithPassword:false,
+          newPassword:'',
         })
 
         let userSearch = reactive({
@@ -222,6 +256,15 @@ export default {
           to:''
         })//从 .. 到 ..
         
+        // 更新显示组织信息
+        let fillOrgShow = (index)=>{
+          orgShowData.orgIndex = index
+          orgShowData.orgname = user.userData.owner[index]
+          orgShowData.orgpassword = user.userData.passwords[index]
+          orgShowData.orgUsers = user.userData.dataUser[index]
+          console.log(orgShowData);
+        }
+
         const submitName = function(name){
             form.editname = false
             user.ChangeItem(name,'name');
@@ -253,38 +296,58 @@ export default {
         //创建组织
         const CreateOrg = function(){
             org.inputCreate = false
-            user.ChangeOrg(org.createOrg,"create")
+            user.CreateOrg(org.createOrg,org.createWithPassword)
         }
         //加入组织
         const JoinOrg = function(){
+          // 不变,直接加入
           org.joinCreate = false
-          user.ChangeOrg(org.joinOrg,"join")
+          user.JoinOrg(org.joinOrg,org.joinPassword)
         }
         //移除组织
         const RemoveOrg = function(org){
-          if(user.RemoveOrg(org)){
+          user.RemoveOrg(org)
+        }
+
+        const DeleteOrg = function(orgname,index){
+          // 显示0
+          fillOrgShow(0)
+          user.DeleteOrg(orgname,index)
+        }
+
+        const RemoveOrgMember = function(orgname,username,index){
+          
+          if(user.RemoveOrgMember(orgname,username)){
             // 移除成功
-            user.userData.player.splice(user.userData.player.indexOf(org),1)
+            user.userData.dataUser[orgShowData.orgIndex].splice(index,1)
           }
         }
 
-        const DeleteOrg = function(org){
-          if(user.DeleteOrg(org)){
-            // 移除成功
-            user.userData.owner.splice(user.userData.owner.indexOf(org),1)
-          }
-        }
-
-        const RemoveOrgMember = function(orgIndex,username){
-          let org = user.userData.owner[orgIndex]
-          if(user.RemoveOrgMember(org,username)){
-            // 移除成功
-            user.userData.dataUser[orgIndex].splice(user.userData.dataUser[orgIndex].indexOf(username),1)
+        const ChangePassword = function(orgname){
+          org.changePassword = false
+          if(user.ChangePassword(orgname,org.newPassword)){
+            // 修改成功
+            user.userData.passwords[orgShowData.orgIndex] = org.newPassword
+            orgShowData.orgpassword = org.newPassword
           }
         }
         //GetCss
         const GetCss = function(index){
           return cssStore.GetBGC(index)
+        }
+
+
+        
+
+        // 序列化密码显示
+        let FormatPassword = function(password){
+          if(password == null){
+            return "山河一统"
+          }else if(password == ""){
+            return "公共组织"
+          }else{
+            return password
+          }
         }
         return{
             option,
@@ -302,7 +365,11 @@ export default {
             RemoveOrg,
             DeleteOrg,
             RemoveOrgMember,
-            GetCss
+            ChangePassword,
+            GetCss,
+            FormatPassword,
+            fillOrgShow,
+            orgShowData
         }
     }
 }
@@ -354,5 +421,16 @@ export default {
     }
     .org:hover{
       cursor: pointer;
+    }
+    .passwordshow{
+      width: 100%;
+      height: 100%;
+    }
+    .orgtitle{
+      font-size: 1.2rem;
+      color: #20a0ff;
+    }
+    .joininput{
+      width: 60%;
     }
 </style>
