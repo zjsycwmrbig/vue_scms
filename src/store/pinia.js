@@ -185,7 +185,118 @@ const useLoginStore = defineStore('Login',{
                     })
                 }
             })
+        },
+        async DeleteOrg(org){
+            await axios.get('api/org/delete',{
+                params:{
+                    org:org
+                }
+            }).then(function(respose){ 
+                if(respose.status == 200){
+                    if(respose.data.res == true){
+                        ElNotification({
+                            title:"删除成功",
+                            message:respose.data.state,
+                            type:"success",
+                            position:"bottom-right"
+                        })
+                        let event = useEventTableStore()
+                        event.GetWeekData()//更新下
+                        return true
+                    }else{
+                        ElNotification({
+                            title:"操作失败",
+                            message:respose.data.state,
+                            type:"error",
+                            position:"bottom-right"
+                        })
+                        return false
+                    }
+                }else{
+                    ElNotification({
+                        title:"请求失败",
+                        message:"服务器错误",
+                        type:"error",
+                        position:"bottom-right"
+                    })
+                    return false
+                }
+            })
+        },
+        async RemoveOrg(org){
+            await axios.get('api/org/quit',{
+                params:{
+                    org:org
+                }
+            }).then(function(respose){
+                if(respose.status == 200){
+                    if(respose.data.res == true){
+                        ElNotification({
+                            title:"退出成功",
+                            message:respose.data.state,
+                            type:"success",
+                            position:"bottom-right"
+                        })
+                        let event = useEventTableStore()
+                        event.GetWeekData()//更新下
+                        return true
+                    }else{
+                        ElNotification({
+                            title:"操作失败",
+                            message:respose.data.state,
+                            type:"error",
+                            position:"bottom-right"
+                        })
+                    }
+                }else{
+                    ElNotification({
+                        title:"请求失败",
+                        message:"服务器错误",
+                        type:"error",
+                        position:"bottom-right"
+                    })
+                }
+                return false
+            })
+        },
+        async RemoveOrgMember(org,user){
+            await axios.get('api/org/removeMember',{
+                params:{
+                    org:org,
+                    member:user
+                }
+            }).then(function(respose){
+                if(respose.status == 200){
+                    if(respose.data.res == true){
+                        ElNotification({
+                            title:"移除成功",
+                            message:respose.data.state,
+                            type:"success",
+                            position:"bottom-right"
+                        })
+                        let event = useEventTableStore()
+                        event.GetWeekData()//更新下
+                        return true
+                    }else{
+                        ElNotification({
+                            title:"操作失败",
+                            message:respose.data.state,
+                            type:"error",
+                            position:"bottom-right"
+                        })
+                    }
+                }else{
+                    ElNotification({
+                        title:"请求失败",
+                        message:"服务器错误",
+                        type:"error",
+                        position:"bottom-right"
+                    })
+                }
+                return false
+            })
         }
+
     }
 })
 //时间

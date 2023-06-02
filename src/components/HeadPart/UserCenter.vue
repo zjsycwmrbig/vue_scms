@@ -89,7 +89,7 @@
                             class="org"
                             :disable-transitions="false"
                             @click="org.showOrg = index"
-                            @close="RemoveOrg(org)"
+                            @close="DeleteOrg(orgname)"
                             
                             :color="GetCss(index)"
                         >
@@ -130,7 +130,9 @@
                     closable
                     :disable-transitions="false"
                     effect="dark"
+                    @close="RemoveOrgMember(org.showOrg,user)" 
                   >
+                  <!-- user.userData.owner[org.showOrg] -->
                     {{ user }}
                   </el-tag>
                 
@@ -259,8 +261,26 @@ export default {
           user.ChangeOrg(org.joinOrg,"join")
         }
         //移除组织
-        const RemoveOrg = function(){
+        const RemoveOrg = function(org){
+          if(user.RemoveOrg(org)){
+            // 移除成功
+            user.userData.player.splice(user.userData.player.indexOf(org),1)
+          }
+        }
 
+        const DeleteOrg = function(org){
+          if(user.DeleteOrg(org)){
+            // 移除成功
+            user.userData.owner.splice(user.userData.owner.indexOf(org),1)
+          }
+        }
+
+        const RemoveOrgMember = function(orgIndex,username){
+          let org = user.userData.owner[orgIndex]
+          if(user.RemoveOrgMember(org,username)){
+            // 移除成功
+            user.userData.dataUser[orgIndex].splice(user.userData.dataUser[orgIndex].indexOf(username),1)
+          }
         }
         //GetCss
         const GetCss = function(index){
@@ -280,6 +300,8 @@ export default {
             CreateOrg,
             JoinOrg,
             RemoveOrg,
+            DeleteOrg,
+            RemoveOrgMember,
             GetCss
         }
     }
