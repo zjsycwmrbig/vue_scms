@@ -1,4 +1,7 @@
 const { defineConfig } = require('@vue/cli-service')
+const path = require('path')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+
 module.exports = defineConfig({
   chainWebpack: config => {
     config.module
@@ -17,11 +20,8 @@ module.exports = defineConfig({
   transpileDependencies: true,
   devServer: {
     host: "0.0.0.0",
-    port: 8080,
-    disableHostCheck: true,
-  },
-  devServer: {
-    
+    // port: 8080,
+    // disableHostCheck: true,
     //这里的ip和端口是前端项目的;下面为需要跨域访问后端项目
     proxy: {
       '/api': {

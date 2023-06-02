@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import { ElMessage, ElNotification } from "element-plus";
+// import ClockWorker from './clock.worker.js'
 
 //登录store
 const useLoginStore = defineStore('Login',{
@@ -403,8 +404,9 @@ const useTimeStore = defineStore('time',{
             let time = useTimeStore()
             // 开始时间并且定位进度
             time.GlobalTime = new Date();
-            this.clockWebWorker = new Worker('http://localhost:8080/clock.worker.js');
-            
+            // http://localhost:8080
+            this.clockWebWorker = new Worker('./clock.worker.js');
+            // this.clockWebWorker = new ClockWorker();
             this.clockWebWorker.postMessage("start")
             
             this.clockWebWorker.onmessage = function (event) {
