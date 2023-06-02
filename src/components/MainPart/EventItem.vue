@@ -22,12 +22,11 @@
 
 
             <div class="eventcard" v-for="(item,itemIndex) in filterData" :key="itemIndex" :style="SetItem(item)" @mouseenter="store.eventShow = false;store.showEvent = item" @mouseleave="store.eventShow = true" > 
-                <!-- v-show="store.className == '' || item.group == store.className" -->
                 <div class="title">
                     {{ item.title }}
                 </div>
                 
-                <el-button  class="delete" :icon="Delete" plain="true" text="true" @click="store.DeleteItem(item)"></el-button>
+                <el-button  class="delete" :icon="Delete" plain="true" text="true" @click="DeleteItem(item)"></el-button>
                 
                 <!-- 处理闹钟 -->
                 
@@ -65,13 +64,14 @@ import { computed } from 'vue'
                     borderColor : css.GetBDC(item.indexID)
                 }
             }
-            // 修改type circle begin等值达到自动填充的效果
+            //设置形状
             let addClass = (index,boxIndex)=>{
-                //type 
+                
                 let indexID = -1
                 for(let i = 0;i < user.userData.owner.length;i++){
                     if(user.userData.owner[i] == store.className) indexID = i
                 }
+
                 if(indexID == -1){
                     ElNotification({
                             title:"无操作权限",
@@ -83,9 +83,11 @@ import { computed } from 'vue'
                 }else{
                     store.form.indexID = indexID
                 }
+
                 //时间
                 let now = time.GlobalTime;
-                const dayOfWeek = now.getDay();
+                const dayOfWeek = (now.getDay() ) % 7;
+                
                 // 计算当前星期的日期
                 const currentWeekDate = now.getDate() - dayOfWeek + index;
                 store.form.date = new Date();
@@ -104,12 +106,19 @@ import { computed } from 'vue'
                 store.form.type = "日常课程";
                 option.addShow = true
             }
+            //设置形状
             let SetShape = (boxIndex)=>{
                 return{
                     top: boxIndex*6 + 48 + 'vh',
                 }
             }
-            
+            //删除事件
+            let DeleteItem = (item)=>{
+                // 移除hover事件
+                store.eventShow = true
+                store.DeleteItem(item)
+            }
+            //筛选数据
             let filterData = computed(()=>{
                 // 对weekdata进行筛选
                 if(props.weekdata == null) return []
@@ -128,6 +137,7 @@ import { computed } from 'vue'
                 Delete,
                 addClass,
                 SetShape,
+                DeleteItem,
                 filterData
             }
         }

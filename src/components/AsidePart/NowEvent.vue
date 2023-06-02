@@ -4,6 +4,7 @@
             <template #header>
                 <div class="head">
                     <span style="font-size: 1.2rem;">{{ showData == null ? "今日无事": showData.title}}</span>
+                    
                     <span>
                         <el-tag
                             type="info"
@@ -78,17 +79,10 @@ export default {
     name: 'NowEvnet',
     setup() {
         let store = useEventTableStore()
-        // let state = useLoginStore()
-        // let time = useTimeStore()
         let map = useMapStore()
         let func = useFuncStore()
         let eventType = ['日常课程','课外活动','临时事务']
-        // 定义了一个定位的函数
-        // setInterval(()=>{
-        //     if(state.loginstate == 1){
-        //     //更新store中的数据
-        // }
-        // },100)
+        
 
         let showFlag = ref(false)
 

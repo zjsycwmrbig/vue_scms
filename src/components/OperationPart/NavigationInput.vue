@@ -77,13 +77,10 @@
                 </div>
             </el-form-item>
             <el-row justify="center">
-                <el-button size="large" @click="bestWay()" :loading="loading">查看最佳路线</el-button>
-                <el-button :loading="loading">测试加载</el-button>
+                <el-button size="large" @click="bestWay()" :loading="loading.value">查看最佳路线</el-button>
             </el-row>
-
             <!-- 导航展示 -->
             <NavigationShow/>
-            
         </el-form>
     </el-drawer>
 </template>
@@ -92,7 +89,7 @@ import { useEventTableStore } from '@/store/pinia'
 import { useOperationStore } from '@/store/pinia'
 import { useMapStore } from '@/store/pinia'
 import NavigationShow from './NavigationShow.vue'
-import { ref } from 'vue'
+import { reactive } from 'vue'
 export default {
     components:{
         NavigationShow
@@ -101,7 +98,9 @@ export default {
         let operationStore = useOperationStore()
         let mapStore = useMapStore()
         let eventStore = useEventTableStore()
-        let loading = ref(false)
+        let loading = reactive({
+            value:false
+        })
         let ChoosePoint = (type) => {
             mapStore.show=true;
             mapStore.mapForm.selected=false
@@ -109,9 +108,9 @@ export default {
         }
 
         function bestWay(){
-            loading = true
+            loading.value = true
             mapStore.SubmitNavigation()
-            loading = false
+            loading.value = false
         }
         let change = function(val){
             mapStore.selectLocations = new Array()

@@ -18,7 +18,6 @@
         <div class="map">
                 <!-- 渲染起点 -->
                 <div class="start">
-                    // 把点坐标放进去
                     <div class="startpoint" :style="LocateLocation(store.navigation.start)" >
                         <el-icon size="large"><Flag /></el-icon>
                     </div>
