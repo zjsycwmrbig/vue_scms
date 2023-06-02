@@ -404,9 +404,8 @@ const useTimeStore = defineStore('time',{
             let time = useTimeStore()
             // 开始时间并且定位进度
             time.GlobalTime = new Date();
-            // http://localhost:8080
             this.clockWebWorker = new Worker('./clock.worker.js');
-            // this.clockWebWorker = new ClockWorker();
+            
             this.clockWebWorker.postMessage("start")
             
             this.clockWebWorker.onmessage = function (event) {
@@ -414,7 +413,6 @@ const useTimeStore = defineStore('time',{
                 if (event.data.getdata) {
                     eventStore.GetWeekData()
                 }
-                // 定位进度 , 这样保证异步和同步的问题
                 time.LocateItem()
             }
 
@@ -429,6 +427,7 @@ const useTimeStore = defineStore('time',{
             //         }
             //     }
             // }, 250)
+
         },
         ChangeSpeed(){
             this.clockWebWorker.postMessage({
@@ -466,7 +465,7 @@ const useTimeStore = defineStore('time',{
                 let index = -1;
                 let value = this.GlobalTime.getTime()
 
-                // 二分查找 value 的位置
+                // 二分查找value的位置
                 while (left <= right) {
                   let mid = Math.floor((left + right) / 2);
                   let indexItem = event.weekData[event.dataList[mid].weekIndex].list[event.dataList[mid].index]
@@ -490,6 +489,7 @@ const useTimeStore = defineStore('time',{
                 while (index < event.dataList.length && event.weekData[event.dataList[index].weekIndex].list[event.dataList[index].index].begin + event.weekData[event.dataList[index].weekIndex].list[event.dataList[index].index].length <= value) {
                   index++;
                 }
+
                 let item
                 let progress
                 // 如果找不到这样的元素，则说明 value 是数组中的最大元素，没有下一个数据,自然也不提醒
@@ -504,10 +504,10 @@ const useTimeStore = defineStore('time',{
                     event.summary.done = index
                     if(progress < 0){
                         // 现在的事项就是需要和ringTime进行比较提醒的事件 并且需要提醒
+                        // 判断闹钟逻辑 , 
                         let det = item.begin - value
                         if(!this.ringMute && item.alarmFlag && det < event.ringTime * 60 * 60 * 1000){
-                            //提醒一下
-                            if(this.ringFlag == false){
+                            if(this.ringFlag == false){                                
                                 ElNotification({
                                     title:item.title + event.ringTime + '小时后就要开始了',
                                     message: '闹钟提醒',
@@ -518,12 +518,13 @@ const useTimeStore = defineStore('time',{
                         }else{
                             this.ringFlag = false
                         }
+
                     }else{
                         if(index + 1 != event.dataList.length){
                             //还有下一个
                             let next = event.weekData[event.dataList[index+1].weekIndex].list[event.dataList[index+1].index]
                             let det = next.begin - value
-                            if(det < event.ringTime * 60 * 60 * 1000 ){
+                            if(!this.ringMute && item.alarmFlag &&det < event.ringTime * 60 * 60 * 1000 ){
                             //提醒一下
                             if(this.ringFlag == false){
                                 ElNotification({
@@ -908,6 +909,7 @@ const useMapStore = defineStore('map',{
                         store.generateInterpolatedPoints()
                         store.navigationShow = true
                         store.NavigationShow()
+                        return true
                     }else{
                         ElNotification({
                             title:"导航出错",
@@ -924,6 +926,7 @@ const useMapStore = defineStore('map',{
                         type:"error"
                     })
                 }
+                return true
             })
             
         },

@@ -3,7 +3,8 @@
         v-model="operationStore.navigationShow"
         title="导航寻路"
         :show-close="true"
-        class="form">
+        class="form"
+        >
 
         <el-form :model="form" label-position="top">
             <el-form-item label="输入起点">
@@ -76,7 +77,8 @@
                 </div>
             </el-form-item>
             <el-row justify="center">
-                <el-button size="large" @click="bestWay()">查看最佳路线</el-button>
+                <el-button size="large" @click="bestWay()" :loading="loading">查看最佳路线</el-button>
+                <el-button :loading="loading">测试加载</el-button>
             </el-row>
 
             <!-- 导航展示 -->
@@ -90,7 +92,7 @@ import { useEventTableStore } from '@/store/pinia'
 import { useOperationStore } from '@/store/pinia'
 import { useMapStore } from '@/store/pinia'
 import NavigationShow from './NavigationShow.vue'
-
+import { ref } from 'vue'
 export default {
     components:{
         NavigationShow
@@ -99,14 +101,17 @@ export default {
         let operationStore = useOperationStore()
         let mapStore = useMapStore()
         let eventStore = useEventTableStore()
+        let loading = ref(false)
         let ChoosePoint = (type) => {
             mapStore.show=true;
             mapStore.mapForm.selected=false
             mapStore.mapForm.selectType=type
         }
+
         function bestWay(){
+            loading = true
             mapStore.SubmitNavigation()
-            // mapStore.generateInterpolatedPoints()//生成插值点
+            loading = false
         }
         let change = function(val){
             mapStore.selectLocations = new Array()
@@ -124,7 +129,6 @@ export default {
                 if(event.location != ''&&event.location != -1){
                     for (let location of mapStore.selectLocations){
                         if(event.location.includes(location) && mapStore.showEvents.indexOf(event.title) == -1){
-                            //不要重复
                             mapStore.showEvents.push(event.title)
                         }
                     }
@@ -136,7 +140,8 @@ export default {
             ChoosePoint,
             mapStore,
             change,
-            bestWay
+            bestWay,
+            loading
         }
     },
 }
