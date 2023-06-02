@@ -16,6 +16,7 @@ module.exports = defineConfig({
   },
   transpileDependencies: true,
   devServer: {
+    
     //这里的ip和端口是前端项目的;下面为需要跨域访问后端项目
     proxy: {
       '/api': {

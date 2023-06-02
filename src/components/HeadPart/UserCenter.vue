@@ -58,7 +58,7 @@
                     </template>
                     <el-input v-if="form.editword" v-model="form.personword" placeholder="请输入你的个性签名">
                         <template #append>
-                            <el-button @click="submitWord(form.word)">
+                            <el-button @click="submitWord(form.personword)">
                                 <el-icon><Check /></el-icon>
                             </el-button>
                         </template>
