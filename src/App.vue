@@ -13,6 +13,9 @@
     <MapPart v-show="true"/> 
     <OperationPart/>
     <AddItem/>
+
+    <!-- 导航展示 -->
+    <NavigationShow/>
   </div>
 
   <div class="HitoPart">
@@ -30,6 +33,7 @@ import AsidePart from './components/AsidePart/AsidePart.vue'
 import MainPart from './components/MainPart/MainPart.vue'
 import OperationPart from './components/OperationPart/OperationPart.vue'
 import AddItem from './components/OperationPart/AddItem.vue'
+import NavigationShow from './components/OperationPart/NavigationShow.vue'
 import { useLoginStore, useMapStore,useTimeStore } from '@/store/pinia';
 
 export default {
@@ -42,7 +46,8 @@ export default {
     AsidePart,
     MainPart,
     OperationPart,
-    AddItem
+    AddItem,
+    NavigationShow
 },
   setup(){
     const mapstore = useMapStore();

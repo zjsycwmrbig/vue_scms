@@ -392,9 +392,10 @@ const useTimeStore = defineStore('time',{
         return{
             GlobalTime:Date,
             Timespeed:1,       
-            ringTemp:false,//标注是否该弹出通知
+            ringFlag:false,//标注是否该弹出通知
             clockWebWorker:Worker,
-            ringMute:false
+            ringMute:false,
+            tipTemp:true
         }
     },
     actions:{
@@ -415,19 +416,7 @@ const useTimeStore = defineStore('time',{
                 }
                 time.LocateItem()
             }
-
-            // let event = useEventTableStore()
-            // // 开始时间并且定位进度
-            // this.GlobalTime = new Date()
-            // setInterval(() => {
-            //     this.GlobalTime = new Date(this.GlobalTime.getTime() + 250 * this.Timespeed)
-            //     if(this.GlobalTime.getDay() == 1){
-            //         if(this.GlobalTime.getTime() < this.Timespeed * 250 * 3){
-            //             event.GetWeekData() //更新数据
-            //         }
-            //     }
-            // }, 250)
-
+            time.CheckNight()
         },
         ChangeSpeed(){
             this.clockWebWorker.postMessage({
@@ -450,11 +439,9 @@ const useTimeStore = defineStore('time',{
                 });
             }
         },
-
-        //根据二分算法实现定位 , 实现进度条 闹钟定时提醒等
+        //根据二分算法实现定位 , 实现进度条 闹钟定时提醒,第二天等
         LocateItem(){
             let event = useEventTableStore()
-
             if(event.dataList.length == 0){
                 event.nowEvent.item = null
                 event.nowEvent.progress = 0
@@ -507,12 +494,19 @@ const useTimeStore = defineStore('time',{
                         // 判断闹钟逻辑 , 
                         let det = item.begin - value
                         if(!this.ringMute && item.alarmFlag && det < event.ringTime * 60 * 60 * 1000){
-                            if(this.ringFlag == false){                                
+                            
+                            if(this.ringFlag == false){  
+                                
                                 ElNotification({
                                     title:item.title + event.ringTime + '小时后就要开始了',
                                     message: '闹钟提醒',
                                     type: 'warning',
+                                    position:"top-left"
+                                    
                                 })
+
+                                let map = useMapStore()
+                                map.NavigationTip(item)
                             }
                             this.ringFlag = true
                         }else{
@@ -526,12 +520,16 @@ const useTimeStore = defineStore('time',{
                             let det = next.begin - value
                             if(!this.ringMute && item.alarmFlag &&det < event.ringTime * 60 * 60 * 1000 ){
                             //提醒一下
+
                             if(this.ringFlag == false){
                                 ElNotification({
                                     title:next.title + event.ringTime + '小时后就要开始了',
                                     message: '闹钟提醒',
                                     type: 'warning',
+                                    position:"top-left"
                                 })
+                                let map = useMapStore()
+                                map.NavigationTip(item)
                             }
                                 this.ringFlag = true
                             }else{
@@ -540,10 +538,37 @@ const useTimeStore = defineStore('time',{
                         }
                     }
                 }
+
                 event.nowEvent.item = item
                 event.nowEvent.progress = progress
             }     
         },
+        //获取是否要更新
+        CheckNight(){
+            let check = function(){
+                let time = useTimeStore()
+                    if(time.tipTemp == true && new Date(time.GlobalTime.getTime()).getHours() >= 22 ){
+                        
+                        time.tipTemp = false
+
+                        let option = useOperationStore()
+                        option.alarmShow = true
+                        option.alarmTab = true
+                    
+                        ElNotification({
+                            title:"事项提示",
+                            message:"明天的事情别做了哦",
+                            type:"info",
+                        })
+                    }else{
+                        time.tipTemp = true
+                    }
+                    setTimeout(check, 1000 )
+                    // * 60 * 60 / time.Timespeed
+                    console.log("check");
+            }
+            check()
+        }
     }
 })
 //事件表
@@ -554,6 +579,7 @@ const useEventTableStore = defineStore('eventtable',{
             eventShow:true,
             eventData:Object,//接收到的数据,按照时间分类
             weekData:Array,//星期数组类型
+            nextWeekData:Array,//下一周的数据
             nowEvent:{
                 item:null,
                 progress:Number
@@ -586,8 +612,9 @@ const useEventTableStore = defineStore('eventtable',{
     },
 
     actions:{
-        // 批量请求数据
+        // 批量请求数据,获取当前周和下周的数据
         GetWeekData(){
+            // 请求本周数据
             let Timestore = useTimeStore()
             axios.get('/api/query/now',{
                 params:{
@@ -616,10 +643,33 @@ const useEventTableStore = defineStore('eventtable',{
                         message: '服务器错误',
                         type: 'error',
                     })
-                }
-                    
-                
+                }    
                 // 构建LocateItem
+            })
+            // 请求下周数据
+            axios.get('/api/query/now',{
+                params:{
+                    date:Timestore.GlobalTime.getTime() + 7 * 24 * 60 * 60 * 1000
+                }
+            }).then(function(respose){
+                if(respose.status == 200){
+                    if(respose.data.res == true){
+                        let event = useEventTableStore()
+                        event.nextWeekData = respose.data.routines;//数组,包含index和数据
+                    }else{
+                        ElNotification({
+                            title: '获取数据失败',
+                            message: '服务器错误',
+                            type: 'error',
+                        })
+                    }
+                }else{
+                    ElNotification({
+                        title: '获取数据失败',
+                        message: '服务器错误',
+                        type: 'error',
+                    })
+                }    
             })
         },
         // 添加事项数据
@@ -897,6 +947,18 @@ const useMapStore = defineStore('map',{
         },
         // 提交导航信息
         async SubmitNavigation(){
+            if(store.navigation.start == '' ) return
+            // 处理locations,防止重复数据
+            if(store.navigation.locations.length != 0){
+                let temp = store.navigation.locations.length
+                for(let i = 0;i < temp;i = i + 1){
+                    if(store.navigation.locations.indexOf(temp[i]) == -1){
+                        store.navigation.locations.push(temp[i])
+                    }
+                }
+            }
+            
+            // 提交导航信息
             let store = useMapStore()
             await axios.post("/api/navigate/Targets",{
                 start:store.navigation.start,
@@ -908,6 +970,7 @@ const useMapStore = defineStore('map',{
                         store.navigationList = respose.data.data
                         store.generateInterpolatedPoints()
                         store.navigationShow = true
+                        // 生成弹出导航
                         store.NavigationShow()
                         return true
                     }else{
@@ -917,8 +980,6 @@ const useMapStore = defineStore('map',{
                             type:"error"
                         })
                     }
-                    
-                    // 返回
                 }else{
                     ElNotification({
                         title:"提交导航信息失败",
@@ -984,6 +1045,30 @@ const useMapStore = defineStore('map',{
             
             
 
+        },
+        // 提示显示导航
+        NavigationTip(item){
+            let store = useMapStore()
+            store.navigation.end = ''
+            store.navigation.locations = new Array()
+            
+            if(item.location == '' || item.location == null || item.location == -1){
+                return
+            }
+
+            // 起点
+            store.navigation.start = 59
+            
+            if(item.type == 2){
+                // 沿途
+                let locations = store.FormatLocationList(item.location,item.type)
+                store.navigation.locations = locations
+            }else{
+                // 终点
+                store.navigation.end = parseInt(item.location)
+            }
+            // 提交导航
+            this.SubmitNavigation()
         }
     }
 })
@@ -1021,6 +1106,7 @@ const useOperationStore = defineStore('aside',{
             navigationShow:false,
             freeTimeShow:false,
             alarmShow:false,
+            alarmTab:false
         }
     },
     actions:{
