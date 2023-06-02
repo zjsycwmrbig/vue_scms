@@ -178,6 +178,7 @@ import { useOperationStore } from '@/store/pinia'
     position: absolute;
     right: 2vw;
     bottom: 1vw;
+    z-index: 1000;
   }
 
 </style>
