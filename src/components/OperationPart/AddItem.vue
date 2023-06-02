@@ -41,9 +41,11 @@
       <el-date-picker
         v-model="eventStore.form.date"
         type="datetime"
-        placeholder="Select date and time"
-        :default-time="defaultTime"
+        placeholder="选择事项开始时间"
+        
       />
+      <!-- :default-time="new Date(timeStore.GlobalTime)" -->
+      <!-- :default-time="timeStore.GlobalTime" -->
     </el-form-item>
     
     <el-form-item label="持续时间">
@@ -89,13 +91,14 @@
 
 <script>
 import { reactive } from 'vue'
-import { useMapStore,useOperationStore,useLoginStore,useEventTableStore } from '@/store/pinia'
+import { useMapStore,useOperationStore,useLoginStore,useEventTableStore, useTimeStore } from '@/store/pinia'
     export default {
         setup(){
           let mapStore = useMapStore()
           let addStore = useOperationStore()
           let userStore = useLoginStore()
           let eventStore = useEventTableStore()
+          let timeStore = useTimeStore()
           // 日期相关,date1是date2的前置条件
 
           const form = reactive({
@@ -111,12 +114,15 @@ import { useMapStore,useOperationStore,useLoginStore,useEventTableStore } from '
               alarmFlag: false,
           })
 
+
+          
+
           // 捷径
           const shortcuts = [
               {
                 text: '一周后',
                 value: () => {
-                  const date = form.date2 == ''?Date.now():form.date2
+                  const date = eventStore.form.end == ''?new Date(timeStore.GlobalTime):new Date(eventStore.form.end)
                   date.setTime(date.getTime() + 3600 * 1000 * 24 * 7)
                   return date
                 },
@@ -124,7 +130,7 @@ import { useMapStore,useOperationStore,useLoginStore,useEventTableStore } from '
               {
                 text: '一月后',
                 value: () => {
-                  const date = form.date2 == ''?Date.now():form.date2
+                  const date = eventStore.form.end == ''?new Date(timeStore.GlobalTime):new Date(eventStore.form.end)
                   date.setTime(date.getTime() + 3600 * 1000 * 24 * 30)
                   return date
                 },
@@ -132,7 +138,7 @@ import { useMapStore,useOperationStore,useLoginStore,useEventTableStore } from '
               {
                 text: '一年后',
                 value: () => {
-                  const date = form.date2 == ''?Date.now():form.date2
+                  const date = eventStore.form.end == ''?new Date(timeStore.GlobalTime):new Date(eventStore.form.end)
                   date.setTime(date.getTime() + 3600 * 1000 * 24 * 365)
                   return date
                 },
@@ -157,7 +163,7 @@ import { useMapStore,useOperationStore,useLoginStore,useEventTableStore } from '
                 userStore,
                 eventStore,
                 shortcuts,
-                circles
+                circles,        
             }
         }
     }

@@ -1,13 +1,11 @@
 <template>
   <div >
-    
     <div class="text_1" >
         <div class="weektitle">
             {{ weekday }}
             <div class="number" v-if="filterData != null">{{ filterData.length }}</div>
         </div>
     </div>
-    
     <div class="eventshow">
         <div class="shape" v-show="store.isClassBox">
             
