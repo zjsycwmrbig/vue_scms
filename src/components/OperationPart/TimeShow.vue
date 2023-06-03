@@ -12,7 +12,7 @@
         <div class="speed" v-show="show">
             <div v-show="!pause">
                 <el-text>时间倍速</el-text>
-                <el-slider v-model="store.Timespeed" max="10000" show-input @change="store.ChangeSpeed()"/>
+                <el-slider v-model="store.Timespeed" max="3600" show-input @change="store.ChangeSpeed()"/>
                 <el-divider />
         </div>
 

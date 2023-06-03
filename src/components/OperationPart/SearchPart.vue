@@ -179,7 +179,9 @@ import { ref,computed } from 'vue'
 
             const handleAlarm = (row) => {
                 event.ChangeAlarm(row)
-                
+                // 修改前面的数据,刷新获取
+                // event.GetWeekData()
+
             }
 
             const handleDelete = (row) => {

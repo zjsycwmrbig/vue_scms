@@ -411,12 +411,29 @@ const useTimeStore = defineStore('time',{
             
             this.clockWebWorker.onmessage = function (event) {
                 time.GlobalTime = new Date(parseInt(event.data.time))
-                if (event.data.getdata) {
+                if(event.data.getdata){
                     eventStore.GetWeekData()
                 }
-                time.LocateItem()
+                // let command = event.data.getdata
+                // console.log(command);
+                // if (command == 1) {
+                //     eventStore.GetWeekData()
+                // }else if(command == 2){
+                //     ElNotification({
+                //         title:"事项提示",
+                //         message:"明天的事情别忘记做了哦",
+                //         type:"info",
+                //         onClick:()=>{
+                //             let option = useOperationStore()
+                //             option.alarmShow = true
+                //             option.alarmTab = true
+                //         }
+                //     })
+                // }
             }
+
             time.CheckNight()
+
         },
         ChangeSpeed(){
             this.clockWebWorker.postMessage({
@@ -442,7 +459,8 @@ const useTimeStore = defineStore('time',{
         //根据二分算法实现定位 , 实现进度条 闹钟定时提醒,第二天等
         LocateItem(){
             let event = useEventTableStore()
-            if(event.dataList.length == 0){
+            
+            if(event.dataList == null){
                 event.nowEvent.item = null
                 event.nowEvent.progress = 0
                 event.summary.done = 0
@@ -476,37 +494,35 @@ const useTimeStore = defineStore('time',{
                 while (index < event.dataList.length && event.weekData[event.dataList[index].weekIndex].list[event.dataList[index].index].begin + event.weekData[event.dataList[index].weekIndex].list[event.dataList[index].index].length <= value) {
                   index++;
                 }
-
-                let item
-                let progress
+                event.summary.done = index
                 // 如果找不到这样的元素，则说明 value 是数组中的最大元素，没有下一个数据,自然也不提醒
-                if (index === event.dataList.length) {
-                    item = null
-                    progress = 0
-                    event.summary.done = index
+                if (index == event.dataList.length) {
+                    event.nowEvent.item = null
+                    event.nowEvent.progress = 100
                 }else{
                     //正在进行和还没进行(一般是0的情况)的情况
-                    item = event.weekData[event.dataList[index].weekIndex].list[event.dataList[index].index]
-                    progress = (((value - item.begin)*100) / (item.length)).toFixed(1)
-                    event.summary.done = index
+                    let item = event.weekData[event.dataList[index].weekIndex].list[event.dataList[index].index]
+
+                    let progress = (((value - item.begin)*100) / (item.length)).toFixed(1)
+
                     if(progress < 0){
-                        // 现在的事项就是需要和ringTime进行比较提醒的事件 并且需要提醒
-                        // 判断闹钟逻辑 , 
+
+                        event.nowEvent.progress = 100
+                        event.nowEvent.item = item
+                        
                         let det = item.begin - value
-                        if(!this.ringMute && item.alarmFlag && det < event.ringTime * 60 * 60 * 1000){
-                            
+                        if(!this.ringMute && item.alarmFlag && det > 0 && det < event.ringTime * 60 * 60 * 1000 ){
                             if(this.ringFlag == false){  
-                                
                                 ElNotification({
                                     title:item.title + event.ringTime + '小时后就要开始了',
                                     message: '闹钟提醒',
                                     type: 'warning',
-                                    position:"top-left"
-                                    
+                                    position:"top-left",
+                                    onClick:()=>{
+                                        let map = useMapStore()
+                                        map.NavigationTip(item)
+                                    }
                                 })
-
-                                let map = useMapStore()
-                                map.NavigationTip(item)
                             }
                             this.ringFlag = true
                         }else{
@@ -514,23 +530,28 @@ const useTimeStore = defineStore('time',{
                         }
 
                     }else{
+                        event.nowEvent.progress = progress
+                        event.nowEvent.item = item
+
                         if(index + 1 != event.dataList.length){
-                            //还有下一个
                             let next = event.weekData[event.dataList[index+1].weekIndex].list[event.dataList[index+1].index]
                             let det = next.begin - value
-                            if(!this.ringMute && item.alarmFlag &&det < event.ringTime * 60 * 60 * 1000 ){
+                            
+                            if(!this.ringMute && item.alarmFlag && det &&det < event.ringTime * 60 * 60 * 1000 ){
                             //提醒一下
 
-                            if(this.ringFlag == false){
-                                ElNotification({
-                                    title:next.title + event.ringTime + '小时后就要开始了',
-                                    message: '闹钟提醒',
-                                    type: 'warning',
-                                    position:"top-left"
-                                })
-                                let map = useMapStore()
-                                map.NavigationTip(item)
-                            }
+                                if(this.ringFlag == false){
+                                    ElNotification({
+                                        title:next.title + event.ringTime + '小时后就要开始了',
+                                        message: '闹钟提醒',
+                                        type: 'warning',
+                                        position:"top-left",
+                                        onClick:()=>{
+                                            let map = useMapStore()
+                                            map.NavigationTip(item)
+                                        }
+                                    })    
+                                }
                                 this.ringFlag = true
                             }else{
                                 this.ringFlag = false
@@ -538,34 +559,35 @@ const useTimeStore = defineStore('time',{
                         }
                     }
                 }
-
-                event.nowEvent.item = item
-                event.nowEvent.progress = progress
             }     
         },
         //获取是否要更新
         CheckNight(){
             let check = function(){
                 let time = useTimeStore()
-                    if(time.tipTemp == true && new Date(time.GlobalTime.getTime()).getHours() >= 22 ){
-                        
-                        time.tipTemp = false
-
+                    if( new Date(time.GlobalTime.getTime()).getHours() >= 22 ){
+                       if(time.tipTemp == true){
+                        ElNotification({
+                            title:"事项提示",
+                            message:"明天的事情别忘记做了哦",
+                            type:"warning",
+                            position:"top-left",
+                            onClick:()=>{
+                                let option = useOperationStore()
+                                option.alarmShow = true
+                                option.alarmTab = true
+                            }
+                        })
                         let option = useOperationStore()
                         option.alarmShow = true
                         option.alarmTab = true
-                    
-                        ElNotification({
-                            title:"事项提示",
-                            message:"明天的事情别做了哦",
-                            type:"info",
-                        })
+                       } 
+                          time.tipTemp = false
                     }else{
                         time.tipTemp = true
                     }
-                    setTimeout(check, 1000 )
-                    // * 60 * 60 / time.Timespeed
-                    console.log("check");
+                    // 一分钟监测一次
+                    setTimeout(check, 1000 * 3)
             }
             check()
         }
@@ -607,7 +629,7 @@ const useEventTableStore = defineStore('eventtable',{
                 locationData:'',
                 alarmFlag:false,
             },
-            
+            showData:Object
         }
     },
 
@@ -624,12 +646,10 @@ const useEventTableStore = defineStore('eventtable',{
                 if(respose.status == 200){
                     if(respose.data.res == true){
                         let event = useEventTableStore()
-                        // let map = useMapStore()
                         event.weekData = respose.data.routines;//数组,包含index和数据
                         event.BuildDataList(respose.data.routines) //构建
+                        event.summary.total = respose.data.total
                         event.show = true;
-                        // 生成导航input
-                        // map.CreateOption()
                     }else{
                         ElNotification({
                             title: '获取数据失败',
@@ -756,24 +776,24 @@ const useEventTableStore = defineStore('eventtable',{
         BuildDataList(routines){
             let event = useEventTableStore()
             event.dataList = new Array()
-            for(var weekIndex = 0;weekIndex < routines.length ; weekIndex = weekIndex + 1) {   
-                for(var index = 0;index < routines[weekIndex].list.length;index = index + 1){
 
-                    
+            for(let weekIndex = 0;weekIndex < routines.length ; weekIndex = weekIndex + 1) {   
+                for(let index = 0;index < routines[weekIndex].list.length;index = index + 1){
                     event.dataList.push({
                         weekIndex:weekIndex,
                         index:index
-                    })//这里直接push进去一个对象就不行!!!
+                    })
+                    //这里直接push进去一个对象就不行!!!
                 }
             }
-            event.summary.total = event.dataList.length //更新summary的数据
+             //更新summary的数据
         },
         //调整闹钟
         async ChangeAlarm(item){
             let begin = item.begin
             // 处理搜索时候的时间
             if(!Number.isInteger(begin)){
-                begin = new Date(begin).getTime()
+                begin = item.beginTime
             }
             let respose;
             if(item.alarmFlag){
@@ -797,16 +817,14 @@ const useEventTableStore = defineStore('eventtable',{
             }
 
             if(respose.status == 200){
-                if(respose.data.res == true){
-                    ElNotification({
-                        title:"操作成功",
-                        message:"已"+(item.alarmFlag?"删除":"添加")+"闹钟",
-                        type:"success",
-                        position:"bottom-right"
-                    })
-                    // 看看这里会更新吗
-                    item.alarmFlag = !item.alarmFlag
-                }
+                ElNotification({
+                    title:"操作成功",
+                    message:"已"+(item.alarmFlag?"删除":"添加")+"闹钟",
+                    type:"success",
+                    position:"bottom-right"
+                })
+                // 看看这里会更新吗
+                item.alarmFlag = !item.alarmFlag
             }else{
                 ElNotification({
                     title:"操作失败",
@@ -940,25 +958,9 @@ const useMapStore = defineStore('map',{
                     store.interpolatedPoints.push(item);
                 }
             }
-            // console.log("导航路线是：")
-            // console.log(store.navigationList)
-            // console.log("插值数组是：")
-            // console.log(store.interpolatedPoints) // 在控制台输出插值点数组
         },
         // 提交导航信息
         async SubmitNavigation(){
-            if(store.navigation.start == '' ) return
-            // 处理locations,防止重复数据
-            if(store.navigation.locations.length != 0){
-                let temp = store.navigation.locations.length
-                for(let i = 0;i < temp;i = i + 1){
-                    if(store.navigation.locations.indexOf(temp[i]) == -1){
-                        store.navigation.locations.push(temp[i])
-                    }
-                }
-            }
-            
-            // 提交导航信息
             let store = useMapStore()
             await axios.post("/api/navigate/Targets",{
                 start:store.navigation.start,
@@ -993,7 +995,8 @@ const useMapStore = defineStore('map',{
         },
         // 格式化地点信息
         FormatLocationList(location,type){
-            if(location == '') return '无地点'
+            if(location == '' ) return '无地点'
+            
             if(type == 2){
                 // 临时事件
                 let locations = location.split('|')
@@ -1005,6 +1008,7 @@ const useMapStore = defineStore('map',{
                 // 普通时间
                 return this.points[parseInt(location)-1].name
             }
+
         },
         // 格式化时间
         FormatLocationString(location,type){
@@ -1135,17 +1139,77 @@ const useFindFreeTimeStore = defineStore('freeTime',{
             let mode = "user"
             
             switch(form.mode){
-                case '0':
+                case 0:
                     // 用户空闲时间
                     mode = "user"
                     break;
-                case '1':
+                case 1:
                     // 组织空闲时间
                     mode = "org"
                     break;
             }
             
             await axios.get(`/api/query/${mode}_free_time`,{
+                params:{
+                    key:form.key,
+                    date:new Date(form.date).getTime(),
+                    length:form.length,
+                }
+            }).then(function(respose){
+                if(respose.status == 200){
+                    // 正常返回
+                    if(respose.data.res == true){
+                        data.freeTime = respose.data.data
+                    }else{
+                        ElNotification({
+                            title: '查找空闲时间错误',
+                            message: respose.data.state,
+                            type: 'error'
+                        })
+                    }
+                }else{
+                    ElNotification({
+                        title: '查找空闲时间错误',
+                        message: '请求异常',
+                        type: 'error'
+                    })
+                }
+            })
+        },
+        async FindOrgFreeTime(){
+            let data = useFindFreeTimeStore()
+            let form = data.form
+            await axios.get('/api/query/org_free_time',{
+                params:{
+                    key:form.key,
+                    date:new Date(form.date).getTime(),
+                    length:form.length,
+                }
+            }).then(function(respose){
+                if(respose.status == 200){
+                    // 正常返回
+                    if(respose.data.res == true){
+                        data.freeTime = respose.data.data
+                    }else{
+                        ElNotification({
+                            title: '查找空闲时间错误',
+                            message: respose.data.state,
+                            type: 'error'
+                        })
+                    }
+                }else{
+                    ElNotification({
+                        title: '查找空闲时间错误',
+                        message: '请求异常',
+                        type: 'error'
+                    })
+                }
+            })
+        },
+        async FindUserFreeTime(){
+            let data = useFindFreeTimeStore()
+            let form = data.form
+            await axios.get('/api/query/user_free_time',{
                 params:{
                     key:form.key,
                     date:new Date(form.date).getTime(),
@@ -1378,6 +1442,18 @@ const useFuncStore = defineStore('func',{
                 let points = useMapStore()
                 for(let i = 0;i < List.length;i = i + 1){
                     // 格式化
+                    // List.push({
+                    //     title:RestList[i].title,
+                    //     group:RestList[i].group,
+                    //     beginTime:List[i].begin,
+                    //     locationData:RestList[i].locationData,
+                    //     alarmFlag:RestList[i].alarmFlag,
+                    //     begin:this.FormatTime(RestList[i].begin),
+                    //     length:this.FormatTimeLength(RestList[i].length),
+                    //     type:this.FormatType(RestList[i].type),
+                    //     location:points.FormatLocationList(RestList[i].location,RestList[i].type)
+                    // })
+                    // List[i].beginTime = List[i].begin
                     List[i].begin = this.FormatTime(List[i].begin)
                     List[i].length = this.FormatTimeLength(List[i].length)
                     List[i].type = this.FormatType(List[i].type)

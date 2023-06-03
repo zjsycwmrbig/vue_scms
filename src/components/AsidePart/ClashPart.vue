@@ -69,34 +69,43 @@ import { useOperationStore } from '@/store/pinia'
       setup(){
         let clashStore = useClashStore()
         let handleOrgFree = ()=>{
+          // 填充数据
           handleFree(0,0)
+          let findFree = useFindFreeTimeStore()
+          let option = useOperationStore()
+          findFree.FindOrgFreeTime()
+          option.freeTimeShow = true
         }
 
         let handleUserFree = (username)=>{
-          console.log(username);
           handleFree(1,username)
+          let findFree = useFindFreeTimeStore()
+          let option = useOperationStore()
+          findFree.FindUserFreeTime()
+          option.freeTimeShow = true
         }
         let handleFree = (mode,vaule)=>{
           // 打开
           let event = useEventTableStore()
-          let option = useOperationStore()
+          
           let findFree = useFindFreeTimeStore()
 
           let temp = event.form.date
           let indexID = event.form.indexID
           let date = new Date(temp).setHours(0,0,0,0)
+          
           findFree.form.mode = mode
           findFree.form.date = date
           findFree.form.length = 1
           if(mode == 0){
+            // 查询组织
             let user = useLoginStore()
             findFree.form.key = user.userData.owner[indexID]
           }else{
+            // 查询用户
             findFree.form.key = vaule
           }
-          findFree.FindFreeTime()
-          // 打开抽屉
-          option.freeTimeShow = true
+          
         }
 
         

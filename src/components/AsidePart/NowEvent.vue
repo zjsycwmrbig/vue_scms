@@ -33,7 +33,7 @@
                                 </div>
                             </template>
                             <el-text v-if="showData != null">{{ func.FormatTime(showData.begin) }}</el-text>
-                            <el-text v-else class="text_1">无</el-text>
+                            <el-text v-else class="text_1">*</el-text>
                         </el-card>
                     </el-col>
                     <el-col :span="8">
@@ -46,7 +46,7 @@
                             <el-text v-if="showData != null">
                                 {{ map.FormatLocationString(showData.location,showData.type)}} 备注信息: {{ showData.locationData }}
                             </el-text>
-                            <el-text v-else class="text_1">事</el-text>
+                            <el-text v-else class="text_1">*</el-text>
                         </el-card>
                     </el-col>
                     <el-col :span="8">
@@ -57,23 +57,22 @@
                                 </div>
                             </template>
                             <el-text v-if="showData!=null">{{ func.FormatTimeLength(showData.length) }}</el-text>
-                            <el-text v-else class="text_1">件</el-text>
+                            <el-text v-else class="text_1">*</el-text>
                         </el-card>
                     </el-col>
                 </el-row>
             </div>
             <el-divider></el-divider>
             <div style="height:2vh">
-                <el-progress  :show-text="false" :percentage="store.nowEvent.progress" :stroke-width="15" striped striped-flow/>    
+                <el-progress  :show-text="false" :percentage="store.nowEvent.progress" :stroke-width="15"/>    
             </div>
             </el-card>
-            <!-- 事件展示 -->
             
         </div>
 </template>
 
 <script>
-import { useEventTableStore,useMapStore, useFuncStore } from '@/store/pinia'
+import { useEventTableStore,useMapStore, useFuncStore, useTimeStore } from '@/store/pinia'
 import { computed, ref} from 'vue'
 export default {
     name: 'NowEvnet',
@@ -81,6 +80,7 @@ export default {
         let store = useEventTableStore()
         let map = useMapStore()
         let func = useFuncStore()
+        let time  = useTimeStore()
         let eventType = ['日常课程','课外活动','临时事务']
         
 
@@ -92,14 +92,10 @@ export default {
             }
             else return store.showEvent
         })
-        setTimeout(() => {
-            store.eventShow = true    
-        }, 10);
         
-        // 更新数据
-        
-
-
+        setInterval(()=>{
+            time.LocateItem()
+        },500);
 
         return {
             store,
@@ -148,3 +144,5 @@ export default {
     font-weight: 600;
 }
 </style>
+
+

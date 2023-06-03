@@ -13,7 +13,7 @@
                         </div>
                         <div>
                             <div class="title2">已完成日程数</div>
-                            <div class="title1" style="font-size: 3rem;">{{ event.summary.done }}</div>
+                            <div class="title1" style="font-size: 3rem;">{{ Number.isInteger(event.summary.done)?event.summary.done:0 }}</div>
                         </div>
                     </div>
                 </el-col>

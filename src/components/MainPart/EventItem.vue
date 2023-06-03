@@ -19,7 +19,7 @@
             </div>        
 
 
-            <div class="eventcard" v-for="(item,itemIndex) in filterData" :key="itemIndex" :style="SetItem(item)" @mouseenter="store.eventShow = false;store.showEvent = item" @mouseleave="store.eventShow = true" > 
+            <div class="eventcard" v-for="(item,itemIndex) in filterData" :key="itemIndex" :style="SetItem(item)" @mouseenter="store.eventShow = false;store.showEvent = item" @mouseleave="store.eventShow = true;" > 
                 <div class="title">
                     {{ item.title }}
                 </div>
