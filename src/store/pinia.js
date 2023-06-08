@@ -1441,19 +1441,7 @@ const useFuncStore = defineStore('func',{
             }else{
                 let points = useMapStore()
                 for(let i = 0;i < List.length;i = i + 1){
-                    // 格式化
-                    // List.push({
-                    //     title:RestList[i].title,
-                    //     group:RestList[i].group,
-                    //     beginTime:List[i].begin,
-                    //     locationData:RestList[i].locationData,
-                    //     alarmFlag:RestList[i].alarmFlag,
-                    //     begin:this.FormatTime(RestList[i].begin),
-                    //     length:this.FormatTimeLength(RestList[i].length),
-                    //     type:this.FormatType(RestList[i].type),
-                    //     location:points.FormatLocationList(RestList[i].location,RestList[i].type)
-                    // })
-                    // List[i].beginTime = List[i].begin
+                    
                     List[i].begin = this.FormatTime(List[i].begin)
                     List[i].length = this.FormatTimeLength(List[i].length)
                     List[i].type = this.FormatType(List[i].type)
