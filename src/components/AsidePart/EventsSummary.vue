@@ -9,16 +9,16 @@
                     <div style="display: flex; flex-direction: column; justify-content: space-around;">
                         <div>
                             <div class="title2">本周日程总数</div>
-                            <div class="title1" style="font-size: 3rem;">{{ event.summary.total }}</div>
+                            <div class="title1" style="font-size: 2rem;">{{ Number.isInteger(event.dataList.length)?event.dataList.length:0 }}</div>
                         </div>
                         <div>
                             <div class="title2">已完成日程数</div>
-                            <div class="title1" style="font-size: 3rem;">{{ Number.isInteger(event.summary.done)?event.summary.done:0 }}</div>
+                            <div class="title1" style="font-size: 2rem;">{{ Number.isInteger(event.summary.done)?event.summary.done:0 }}</div>
                         </div>
                     </div>
                 </el-col>
                 <el-col :span="12" style="position: relative;">
-                        <el-progress class="progress" type="circle" :percentage="(event.summary.done * 100 / event.summary.total).toFixed(1)" />
+                        <el-progress class="progress" type="circle" :percentage="(event.summary.done * 100 / event.dataList.length).toFixed(1)" />
                 </el-col>
             </el-row>
         </el-card>

@@ -648,7 +648,6 @@ const useEventTableStore = defineStore('eventtable',{
                         let event = useEventTableStore()
                         event.weekData = respose.data.routines;//数组,包含index和数据
                         event.BuildDataList(respose.data.routines) //构建
-                        event.summary.total = respose.data.total
                         event.show = true;
                     }else{
                         ElNotification({
