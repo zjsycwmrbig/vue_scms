@@ -1,4 +1,4 @@
-# scms
+# scms BUPT 数据结构课设 日程管理系统前端 VUE
 
 ## Project setup
 ```
